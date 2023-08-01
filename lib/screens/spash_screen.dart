@@ -1,8 +1,12 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lively_studio/config/getter.dart';
-import 'package:lively_studio/screens/dashboard_screen.dart';
+import 'package:lively_studio/provider/websocket_provider.dart';
+import 'package:lively_studio/screens/home/dashboard_screen.dart';
 import 'package:lively_studio/screens/login_screen.dart';
+import 'package:lively_studio/utils/shared_preference.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -35,8 +39,7 @@ class SplashScreenState extends State<SplashScreen> {
                 alignment: Alignment.center,
                 child: SizedBox(
                   width: 60.w,
-                  child: Image.asset(
-                      'assets/logo/lively-logo.png'), // Replace with your image asset path
+                  child: Image.asset('assets/logo/lively-logo.png'), // Replace with your image asset path
                 ),
               ),
             ),
@@ -58,13 +61,9 @@ class SplashScreenState extends State<SplashScreen> {
 
   void _checkIsLoggedInOrNot() async {
     await Future.delayed(const Duration(seconds: 3));
-    ConfigGetter.getStoredAccountDetails().then((json) => {
-          if (json.isEmpty)
-            {context.go('/login')}
-          else if (json.containsKey('token'))
-            {context.go('/dashboard')}
-          else
-            {context.go('/login')}
+
+    SharedPreferenceUtility.getStoredAccountDetails().then((valid) => {
+          if (valid) {Provider.of<WebSocketProvider>(context, listen: false).weSocketListener(), context.go('/dashboard')} else {context.go('/login')}
         });
   }
 }

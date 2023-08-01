@@ -15,9 +15,10 @@ TextStyle heading2 = const TextStyle(
   fontWeight: FontWeight.w700,
 );
 
-TextStyle heading5 = const TextStyle(
+TextStyle heading18 = const TextStyle(
   fontSize: 18,
-  fontWeight: FontWeight.w600,
+  color: Colors.black,
+  fontWeight: FontWeight.w700,
 );
 
 TextStyle heading6 = const TextStyle(
@@ -25,9 +26,20 @@ TextStyle heading6 = const TextStyle(
   fontWeight: FontWeight.w600,
 );
 
+TextStyle heading14 = const TextStyle(
+  fontSize: 14,
+  fontWeight: FontWeight.w600,
+);
+
 TextStyle generalText = const TextStyle(
   fontSize: 12,
   fontWeight: FontWeight.w600,
+);
+
+TextStyle dangerText = const TextStyle(
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
+  color: Colors.red
 );
 
 //buttons
@@ -50,3 +62,10 @@ ButtonStyle textButtonNegativeStyle = TextButton.styleFrom(
   textStyle: const TextStyle(
       fontSize: 14, fontWeight: FontWeight.bold, color: primary),
 ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0));
+
+const BoxShadow generalBoxShadow =  BoxShadow(
+  color: Color.fromRGBO(0, 0, 0, 0.08),
+  offset: Offset(1.0, 1.0),
+  blurRadius: 2.0,
+  spreadRadius: 0.0,
+);

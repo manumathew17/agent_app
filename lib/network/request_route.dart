@@ -7,4 +7,40 @@ class RequestRouter {
   void validateUser(dynamic requestBody, RequestCallbacks requestCallbacks) {
     _networkRequest.loginCall('user/login', requestBody, requestCallbacks);
   }
+
+  updateFcmToken(Map<String, dynamic> requestBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.putCall("user/fcm_token", requestBody, requestCallbacks);
+  }
+
+  getCurrencyCode(RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("company/info", null, requestCallbacks);
+  }
+
+  getScheduledCall(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("schedulecall/getAllScheduleCall", queryParams, requestCallbacks);
+  }
+
+  getProductList(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("products", queryParams, requestCallbacks);
+  }
+
+  generateRoomId(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("call/video/generate/room", postBody, requestCallbacks);
+  }
+
+  getAllCustomerByAgent(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("conferenceUsers/agent/wise", queryParams, requestCallbacks);
+  }
+
+  getCallHistory(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("schedulecall/call/history", queryParams, requestCallbacks);
+  }
+
+  generateCallToken(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("call/video/generate/call-token", postBody, requestCallbacks);
+  }
+
+  updateCallStatus(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("schedulecall/UpdateCallStatus", postBody, requestCallbacks);
+  }
 }

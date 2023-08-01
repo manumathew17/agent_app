@@ -20,6 +20,12 @@ class GeneralSnackBar {
     ScaffoldMessenger.of(_context).showSnackBar(snackBar);
   }
 
+  void showSuccessSnackBar(String message) {
+    final snackBar = CustomSnackBar(
+        message: message, iconData: Icons.check_circle, color: darkGreen);
+    ScaffoldMessenger.of(_context).showSnackBar(snackBar);
+  }
+
   void hideSnackBar() {
     ScaffoldMessenger.of(_context).hideCurrentSnackBar();
   }

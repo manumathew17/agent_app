@@ -8,9 +8,13 @@ import 'package:lively_studio/network/request_route.dart';
 import 'package:lively_studio/utils/general.dart';
 import 'package:lively_studio/utils/shared_preference.dart';
 import 'package:lively_studio/widgets/snackbar.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 
 import '../app_color.dart';
+import '../provider/websocket_provider.dart';
 import '../style.dart';
 import '../widgets/loader.dart';
 
@@ -35,6 +39,30 @@ class LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
+  void initZegoCloud() {
+    ZegoUIKitPrebuiltCallInvitationService().init(
+      appID: 1793642705,
+      appSign: 'd6af0bc5bc48ad0e08bd949eee31f8ddf6431c6e11067ab687673c5ebab06609',
+      userID: 'manu17',
+      userName: 'Manu Mathew',
+      plugins: [ZegoUIKitSignalingPlugin()],
+    );
+  }
+
+  void logOutZegoCloud() {
+    ZegoUIKitPrebuiltCallInvitationService().uninit();
+  }
+
+  void _getCurrencyDetails() {
+    requestRouter.getCurrencyCode(RequestCallbacks(
+        onSuccess: (response) async => {
+              await SharedPreferenceUtility.storeCompanyDetails(jsonEncode(jsonDecode(response)["data"])),
+              Provider.of<WebSocketProvider>(context, listen: false).weSocketListener(),
+              context.go('/dashboard')
+            },
+        onError: (error) => {_generalSnackBar.showErrorSnackBar(error)}));
+  }
+
   _validateUser(String username, String password) {
     if (_formKey.currentState?.validate() ?? false) {
       final requestBody = {
@@ -44,16 +72,9 @@ class LoginScreenState extends State<LoginScreen> {
       Loader.show(context);
       requestRouter.validateUser(
           requestBody,
-          RequestCallbacks(onSuccess: (response) {
-            SharedPreferenceUtility.storeUser(jsonEncode(jsonDecode(response)['user']))
-                .then((value) => {
-                      if (!value)
-                        {
-                          _generalSnackBar
-                              .showWarningSnackBar("Cant able to save")
-                        },
-                      context.go('/dashboard')
-                    });
+          RequestCallbacks(onSuccess: (response) async {
+            await SharedPreferenceUtility.storeUser(jsonEncode(jsonDecode(response)['user']));
+            _getCurrencyDetails();
           }, onError: (error) {
             _generalSnackBar.showErrorSnackBar("Authentication failed");
           }));
@@ -83,8 +104,7 @@ class LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.topCenter,
                       child: SizedBox(
                         width: 20.h,
-                        child: Image.asset(
-                            'assets/logo/lively-logo.png'), // Replace with your image asset path
+                        child: Image.asset('assets/logo/lively-logo.png'), // Replace with your image asset path
                       ),
                     ),
 
@@ -117,8 +137,7 @@ class LoginScreenState extends State<LoginScreen> {
                               validator: (value) {
                                 if (value?.isEmpty ?? true) {
                                   return 'Please enter email id';
-                                } else if (!EmailValidator.validate(
-                                    value.toString())) {
+                                } else if (!EmailValidator.validate(value.toString())) {
                                   return 'Please enter valid email id';
                                 }
                                 return null;
@@ -142,9 +161,7 @@ class LoginScreenState extends State<LoginScreen> {
                                 suffixIcon: IconButton(
                                   color: textGrey,
                                   splashRadius: 1,
-                                  icon: Icon(_passwordVisible
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined),
+                                  icon: Icon(_passwordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined),
                                   onPressed: () => _togglePassword(),
                                 ),
                                 border: const OutlineInputBorder(
@@ -170,8 +187,7 @@ class LoginScreenState extends State<LoginScreen> {
                         width: 100.w,
                         child: FilledButton(
                           onPressed: () {
-                            _validateUser(usernameController.text,
-                                passwordController.text);
+                            _validateUser(usernameController.text, passwordController.text);
                           },
                           child: const Text('Login'),
                         )),

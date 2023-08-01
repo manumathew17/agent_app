@@ -47,10 +47,12 @@ class CustomSnackBarContent extends StatelessWidget {
           color: color,
         ),
         const SizedBox(width: 8.0),
-        Text(
-          message,
-          style: TextStyle(
-            color: color,
+        Expanded(
+          child: Text(
+            message,
+            style: TextStyle(
+              color: color,
+            ),
           ),
         ),
       ],
