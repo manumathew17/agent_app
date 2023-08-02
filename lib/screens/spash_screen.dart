@@ -17,11 +17,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-  late NavigatorState _navigator;
+
 
   @override
   void initState() {
-    _navigator = Navigator.of(context);
+
     _checkIsLoggedInOrNot();
     super.initState();
   }
@@ -60,7 +60,7 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   void _checkIsLoggedInOrNot() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 1));
 
     SharedPreferenceUtility.getStoredAccountDetails().then((valid) => {
           if (valid) {Provider.of<WebSocketProvider>(context, listen: false).weSocketListener(), context.go('/dashboard')} else {context.go('/login')}

@@ -6,15 +6,18 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/network/request_route.dart';
+import 'package:lively_studio/provider/home-provider.dart';
 import 'package:lively_studio/screens/call_list_screen.dart';
 import 'package:lively_studio/screens/customer/chat_screen.dart';
 import 'package:lively_studio/screens/home/home_screen.dart';
 import 'package:lively_studio/screens/profile/profile_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 import '../../app_color.dart';
+import '../../provider/websocket_provider.dart';
 import '../../style.dart';
 import '../../widgets/progress_bar.dart';
 import '../calls/calls_screen.dart';
@@ -52,7 +55,13 @@ class DashBoardScreenState extends State<DashBoardScreen> {
   @override
   void initState() {
     setupInteractedMessage();
+    _updateOnlineStatus();
     super.initState();
+  }
+
+  _updateOnlineStatus() {
+    Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus();
+
   }
 
 
@@ -67,7 +76,7 @@ class DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   void _handleMessage(RemoteMessage message) {
-    Navigator.pushNamed(context, '/video-call');
+    Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(message.data);
   }
 
 

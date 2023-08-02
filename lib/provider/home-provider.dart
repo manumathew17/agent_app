@@ -14,8 +14,21 @@ class HomeProvider extends ChangeNotifier {
   RequestRouter requestRouter = RequestRouter();
   List<CallScheduled> callHistoryList = [];
   List<CallScheduled> scheduledCallList = [];
+  bool isOnline = false;
 
+  updateOnlineStatus() {
+    final putBody = {"online": !isOnline};
 
+    requestRouter.updateOnlineStatus(
+        putBody,
+        RequestCallbacks(onSuccess: (response) {
+          isOnline = !isOnline;
+
+          notifyListeners();
+        }, onError: (error) {
+          print(error);
+        }));
+  }
 
   void getScheduledCall() async {
     await requestRouter.getScheduledCall(

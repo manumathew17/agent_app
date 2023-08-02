@@ -68,7 +68,7 @@ class GeneralUtils {
   static String formatDateTime(String dateTimeString) {
     try {
       DateTime dateTime = DateTime.parse(dateTimeString);
-      String formattedDate = DateFormat('dd-MM-yy').format(dateTime);
+      String formattedDate = DateFormat('dd-MM').format(dateTime);
       String formattedTime = DateFormat('hh:mm a').format(dateTime);
       return '$formattedDate $formattedTime';
     } catch (_) {

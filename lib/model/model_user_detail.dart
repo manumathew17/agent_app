@@ -1,5 +1,6 @@
 class UserDetail {
   String companyId;
+  String user_name;
   String userId;
   String companyName;
   String token;
@@ -8,6 +9,7 @@ class UserDetail {
 
   UserDetail({
     required this.companyId,
+    required this.user_name,
     required this.userId,
     required this.companyName,
     required this.token,
@@ -19,10 +21,11 @@ class UserDetail {
   factory UserDetail.fromJson(Map<String, dynamic> json) {
     return UserDetail(
       companyId: json['company_id'],
-      userId: json['user_id'],
-      companyName: json['company_name'],
-      token: json['token'],
-      website: json['website'],
+      user_name: json['user_name'] ?? "NA",
+      userId: json['user_id'] ?? "NA",
+      companyName: json['company_name'] ?? "NA",
+      token: json['token'] ?? "NA",
+      website: json['website'] ?? "NA",
       websiteId: json['website_id'].toString(),
     );
   }

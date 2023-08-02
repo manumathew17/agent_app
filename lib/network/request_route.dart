@@ -43,4 +43,20 @@ class RequestRouter {
   updateCallStatus(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
     _networkRequest.postCall("schedulecall/UpdateCallStatus", postBody, requestCallbacks);
   }
+
+  getMissedCall(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("conferenceUsers/missed/calls", queryParams, requestCallbacks);
+  }
+
+  updateOnlineStatus(Map<String, dynamic> putBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.putCall("user/change/status", putBody, requestCallbacks);
+  }
+
+  getCustomerDetails(Map<String, dynamic> queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("conferenceUsers/customer/details", queryParams, requestCallbacks);
+  }
+
+  updateCustomerDetails(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("conferenceUsers/update-conference-user", postBody, requestCallbacks);
+  }
 }

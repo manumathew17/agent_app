@@ -73,12 +73,8 @@ class ProfileScreenState extends State<ProfileScreen> {
     requestRouter.updateFcmToken(
         requestBody,
         RequestCallbacks(
-            onSuccess: (response) async => {await SharedPreferenceUtility.clearAllStorage(),
-              Loader.hide(),
-              context.go('/login')},
-            onError: (error) => {
-              Loader.hide(),
-              _generalSnackBar.showErrorSnackBar(error)}));
+            onSuccess: (response) async => {await SharedPreferenceUtility.clearAllStorage(), Loader.hide(), context.go('/login')},
+            onError: (error) => {Loader.hide(), _generalSnackBar.showErrorSnackBar(error)}));
   }
 
   Future<void> _logoutConfirm(BuildContext context) {

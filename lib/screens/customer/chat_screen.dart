@@ -1,12 +1,19 @@
+import 'dart:convert';
+
 import 'package:currency_symbols/currency_symbols.dart';
 import 'package:flutter/material.dart';
+import 'package:lively_studio/model/model_customer.dart';
+import 'package:lively_studio/network/callback.dart';
+import 'package:lively_studio/network/request_route.dart';
 import 'package:lively_studio/provider/customer_chat_provider.dart';
 import 'package:lively_studio/screens/product/product_detail_screen.dart';
+import 'package:lively_studio/widgets/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../app_color.dart';
 import '../../config/getter.dart';
+import '../../model/model_customer_data.dart';
 import '../../provider/catalog_provider.dart';
 import '../../utils/general.dart';
 import 'customer_details_screen.dart';
@@ -31,6 +38,27 @@ class ChatScreenState extends State<ChatScreen> {
   void dispose() {
     super.dispose();
     _searchController.dispose();
+  }
+
+  _getUserDetails(Customer customer) {
+    Loader.show(context);
+    RequestRouter requestRouter = RequestRouter();
+    final queryParams = {"customer_uuid": customer.customerUuid};
+    requestRouter.getCustomerDetails(
+        queryParams,
+        RequestCallbacks(
+            onSuccess: (response) {
+              Map<String, dynamic> jsonDataMap = jsonDecode(response);
+              final customerDetail = CustomerData.fromJson(jsonDataMap['data']);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CustomerDetailsScreen(
+                          customerData: customerDetail,
+                        )),
+              );
+            },
+            onError: (_) {}));
   }
 
   @override
@@ -96,14 +124,8 @@ class ChatScreenState extends State<ChatScreen> {
                             padding: const EdgeInsets.only(top: 0, bottom: 20),
                             child: InkWell(
                               onTap: () => {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => CustomerDetailsScreen(
-                                            customerData: customerData.customerList[index],
-                                          )),
-                                )
-                              },
+                                customerData.setSelectedCustomer(customerData.customerList[index]),
+                                _getUserDetails(customerData.customerList[index])},
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: greyGeneral,

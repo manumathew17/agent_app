@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/provider/home-provider.dart';
 import 'package:lively_studio/screens/product/product_detail_screen.dart';
 import 'package:lively_studio/utils/general.dart';
@@ -11,8 +12,6 @@ import '../../provider/call_history_provider.dart';
 import '../../style.dart';
 import '../../widgets/animated_progress.dart';
 
-enum SampleItem { itemOne, itemTwo, itemThree }
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,8 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  bool light1 = true;
-
   @override
   initState() {
     super.initState();
@@ -52,49 +49,50 @@ class HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
                             width: 10.h,
                             child: Image.asset('assets/logo/lively-logo.png'), // Replace with your image asset path
                           ),
                           Text(
-                            'Hello Manu',
+                            'Hello ${ConfigGetter.USERDETAILS.user_name}',
                             style: generalText,
                           )
                         ],
                       ),
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Text(
-                            'Active',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
+                    Consumer<HomeProvider>(builder: (context, onlineStatus, child) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Text(
+                              onlineStatus.isOnline ? 'Online' : 'Offline',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                        Switch(
-                          value: light1,
-                          onChanged: (bool value) {
-                            setState(() {
-                              light1 = value;
-                            });
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Text(
-                            "Mon - Fri, 10:00 AM - 6-00 PM",
-                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w400),
+                          Switch(
+                            value: onlineStatus.isOnline,
+                            onChanged: (bool value) {
+                              Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus();
+                            },
                           ),
-                        )
-                      ],
-                    )
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Text(
+                              "Mon - Fri, 10:00 AM - 6-00 PM",
+                              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w400),
+                            ),
+                          )
+                        ],
+                      );
+                    })
                   ],
                 ),
               ),

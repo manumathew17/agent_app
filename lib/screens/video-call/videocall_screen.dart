@@ -22,7 +22,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
 
   _updateRoomStatus(status) async {
     final requestBody = {'token': Provider.of<WebSocketProvider>(context, listen: false).call_token, 'call_status': status};
-    requestRouter.updateFcmToken(requestBody, RequestCallbacks(onSuccess: (response) {}, onError: (error) {}));
+    requestRouter.updateCallStatus(requestBody, RequestCallbacks(onSuccess: (response) {}, onError: (error) {}));
   }
 
   @override
