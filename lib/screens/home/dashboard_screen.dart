@@ -80,12 +80,12 @@ class DashBoardScreenState extends State<DashBoardScreen> {
   }
 
 
-  _joinCall() {
-    if (ZegoUIKitPrebuiltCallMiniOverlayMachine().isMinimizing) {
-      return;
-    }
-    GoRouter.of(context).push("/video-call");
-  }
+  // _joinCall() {
+  //   if (ZegoUIKitPrebuiltCallMiniOverlayMachine().isMinimizing) {
+  //     return;
+  //   }
+  //   GoRouter.of(context).push("/video-call");
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -19,10 +19,22 @@ class VideoCallScreen extends StatefulWidget {
 class VideoCallScreenState extends State<VideoCallScreen> {
   ZegoUIKitPrebuiltCallController? callController;
   RequestRouter requestRouter = RequestRouter();
+  late String callToken;
 
-  _updateRoomStatus(status) async {
-    final requestBody = {'token': Provider.of<WebSocketProvider>(context, listen: false).call_token, 'call_status': status};
-    requestRouter.updateCallStatus(requestBody, RequestCallbacks(onSuccess: (response) {}, onError: (error) {}));
+  _updateRoomStatus(status, BuildContext  ctx)  {
+
+    final requestBody = {'token': callToken, 'call_status': status};
+    requestRouter.updateCallStatus(
+        requestBody,
+        RequestCallbacks(onSuccess: (response) {
+          if (status == 3) {
+            Navigator.of(ctx).pop(true);
+          }
+        }, onError: (error) {
+          if (status == 3) {
+            Navigator.of(ctx).pop(true);
+          }
+        }));
   }
 
   @override
@@ -30,7 +42,8 @@ class VideoCallScreenState extends State<VideoCallScreen> {
     super.initState();
     FlutterRingtonePlayer.stop();
     callController = ZegoUIKitPrebuiltCallController();
-    _updateRoomStatus(2);
+    callToken = Provider.of<WebSocketProvider>(context, listen: false).call_token; // Move initialization to initState()
+    _updateRoomStatus(2, context);
   }
 
   // @override
@@ -60,15 +73,26 @@ class VideoCallScreenState extends State<VideoCallScreen> {
             userName: ConfigGetter.USERDETAILS.userId,
             callID: Provider.of<WebSocketProvider>(context).room_id,
             controller: callController,
-            config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
-              ..onOnlySelfInRoom = (context) {
-                if (PrebuiltCallMiniOverlayPageState.idle != ZegoUIKitPrebuiltCallMiniOverlayMachine().state()) {
-                  /// in minimizing
-                  ZegoUIKitPrebuiltCallMiniOverlayMachine().changeState(PrebuiltCallMiniOverlayPageState.idle);
-                } else {
-                  Navigator.of(context).pop();
-                }
-              }
+            config: ZegoUIKitPrebuiltCallConfig.groupVideoCall()
+              // ..onOnlySelfInRoom = (context) {
+              //   if (PrebuiltCallMiniOverlayPageState.idle != ZegoUIKitPrebuiltCallMiniOverlayMachine().state()) {
+              //     /// in minimizing
+              //     ZegoUIKitPrebuiltCallMiniOverlayMachine().changeState(PrebuiltCallMiniOverlayPageState.idle);
+              //   } else {
+              //     Navigator.of(context).pop();
+              //   }
+              // }
+            ..bottomMenuBarConfig.buttons =  [
+              ZegoMenuBarButtonName.hangUpButton,
+              ZegoMenuBarButtonName.minimizingButton,
+              ZegoMenuBarButtonName.toggleScreenSharingButton,
+              ZegoMenuBarButtonName.toggleCameraButton,
+              ZegoMenuBarButtonName.toggleMicrophoneButton,
+              ZegoMenuBarButtonName.showMemberListButton,
+              ZegoMenuBarButtonName.switchCameraButton,
+
+
+            ]
               ..onHangUpConfirmation = (BuildContext context) async {
                 return await showDialog(
                   context: context,
@@ -80,7 +104,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
                         TextButton(
                           child: const Text('Cancel'),
                           onPressed: () {
-                             Navigator.of(context).pop(false);
+                            Navigator.of(context).pop(false);
                           },
                         ),
                         TextButton(
@@ -88,9 +112,8 @@ class VideoCallScreenState extends State<VideoCallScreen> {
                             'Exit',
                             style: TextStyle(color: Colors.red),
                           ),
-                          onPressed: () async {
-                            await _updateRoomStatus(3);
-                            Navigator.of(context).pop(true);
+                          onPressed: () {
+                            _updateRoomStatus(3,context);
                           },
                         ),
                       ],
@@ -100,8 +123,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
               }
 
               /// support minimizing
-              ..topMenuBarConfig.isVisible = true
-
+              ..topMenuBarConfig.isVisible = false
               ..topMenuBarConfig.buttons = [
                 ZegoMenuBarButtonName.minimizingButton,
                 ZegoMenuBarButtonName.showMemberListButton,

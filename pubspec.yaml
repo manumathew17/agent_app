@@ -57,6 +57,7 @@ dependencies:
   vibration: ^1.7.7
   flutter_ringtone_player: ^3.2.0
   weekday_selector: ^1.1.0
+  zego_uikit_prebuilt_video_conference: ^2.3.2
 
 
 dev_dependencies:

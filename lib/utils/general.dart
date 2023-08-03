@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +18,6 @@ class GeneralUtils {
     try {
       Vibration.vibrate(duration: 1000);
       FlutterRingtonePlayer.play(fromAsset: "assets/audio/alarm.mp3");
-
     } catch (e) {
       print('Error vibrate : $e');
     }
@@ -73,6 +73,16 @@ class GeneralUtils {
       return '$formattedDate $formattedTime';
     } catch (_) {
       return "NA";
+    }
+  }
+
+  static TimeOfDay intToTimeOfDay(int hours) {
+    try {
+      final int hour = hours % 24;
+      final TimeOfDay timeOfDay = TimeOfDay(hour: hour, minute: 0);
+      return timeOfDay;
+    } catch (_) {
+      return const TimeOfDay(hour: 0, minute: 0);
     }
   }
 }

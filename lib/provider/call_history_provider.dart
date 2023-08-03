@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 import '../model/model_call_history.dart';
 import '../model/model_call_scheduled.dart';
@@ -14,6 +15,7 @@ class CallHistoryProvider extends ChangeNotifier {
   List<CallScheduled> callScheduledList = [];
   List<CallHistory> callHistoryList = [];
   List<MissedCall> callMissedList = [];
+  List<CallHistory> todayCallList = [];
 
   void getScheduledCall() async {
     await requestRouter.getScheduledCall(
@@ -42,10 +44,32 @@ class CallHistoryProvider extends ChangeNotifier {
         null, RequestCallbacks(onSuccess: (response) => {_createCallHistoryList(response)}, onError: (error) => {Logger.log(error)}));
   }
 
+  void getTodayCall() {
+    DateTime today = DateTime.now();
+    DateTime nextDay = today.add(const Duration(days: 1));
+    String startDate = DateFormat('yyyy-MM-dd').format(today);
+    String endDate = DateFormat('yyyy-MM-dd').format(nextDay);
+    final queryParams = {
+      "start_date": startDate,
+      "end_date" : endDate
+    };
+
+    requestRouter.getCallHistory(queryParams, RequestCallbacks(onSuccess: (response){
+      print(response);
+      Map<String, dynamic> jsonDataMap = jsonDecode(response);
+      List<dynamic> data = jsonDataMap['data']['callHistory'];
+      todayCallList = data.map((item) => CallHistory.fromJson(item)).toList();
+      notifyListeners();
+
+    }, onError: (error){
+
+    }));
+
+  }
+
   _createMissedCallList(response) {
     Map<String, dynamic> jsonDatMap = jsonDecode(response);
     List<dynamic> data = jsonDatMap['data']["missed_calls"];
-    print(data);
     callMissedList = data.map((item) => MissedCall.fromJson(item)).toList();
     notifyListeners();
   }
@@ -54,8 +78,6 @@ class CallHistoryProvider extends ChangeNotifier {
     Map<String, dynamic> jsonDataMap = jsonDecode(response);
     List<dynamic> data = jsonDataMap['data'];
     List<dynamic> filteredData = data.where((item) => item['call_type'] != 'instant').toList();
-    print('jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj');
-    print(filteredData[0]);
     callScheduledList = filteredData.map((item) => CallScheduled.fromJson(item)).toList();
     notifyListeners();
   }

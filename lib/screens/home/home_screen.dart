@@ -23,7 +23,8 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-    Provider.of<CallHistoryProvider>(context, listen: false).getCallHistory();
+   // Provider.of<CallHistoryProvider>(context, listen: false).getCallHistory();
+    Provider.of<CallHistoryProvider>(context, listen: false).getTodayCall();
   }
 
   @override
@@ -108,7 +109,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               Expanded(
                 child: ListView.builder(
-                    itemCount: homeProvider.callHistoryList.length,
+                    itemCount: homeProvider.todayCallList.length,
                     itemBuilder: ((context, index) {
                       return Padding(
                         padding: const EdgeInsets.all(10.0),
@@ -129,7 +130,7 @@ class HomeScreenState extends State<HomeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
-                                      homeProvider.callHistoryList[index].customerName,
+                                      homeProvider.todayCallList[index].customerName,
                                       style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
@@ -140,7 +141,7 @@ class HomeScreenState extends State<HomeScreen> {
                                       height: 5,
                                     ),
                                     Text(
-                                      GeneralUtils.getTime(homeProvider.callHistoryList[index].callDateTime),
+                                      GeneralUtils.getTime(homeProvider.todayCallList[index].callDateTime),
                                       style: generalText,
                                     ),
                                     const SizedBox(
@@ -160,7 +161,7 @@ class HomeScreenState extends State<HomeScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => ProductDetailsWebView(
-                                                      productUrl: homeProvider.callHistoryList[index].productUrl,
+                                                      productUrl: homeProvider.todayCallList[index].productUrl,
                                                     )),
                                           );
                                         },
@@ -184,7 +185,7 @@ class HomeScreenState extends State<HomeScreen> {
                                         ),
                                         color: primary,
                                         onPressed: () {
-                                          GeneralUtils.makePhoneCall(homeProvider.callHistoryList[index].phoneNumber);
+                                          GeneralUtils.makePhoneCall(homeProvider.todayCallList[index].phoneNumber);
                                         },
                                       ),
                                     ),

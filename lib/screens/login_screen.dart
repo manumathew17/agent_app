@@ -39,15 +39,15 @@ class LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
-  void initZegoCloud() {
-    ZegoUIKitPrebuiltCallInvitationService().init(
-      appID: 1793642705,
-      appSign: 'd6af0bc5bc48ad0e08bd949eee31f8ddf6431c6e11067ab687673c5ebab06609',
-      userID: 'manu17',
-      userName: 'Manu Mathew',
-      plugins: [ZegoUIKitSignalingPlugin()],
-    );
-  }
+  // void initZegoCloud() {
+  //   ZegoUIKitPrebuiltCallInvitationService().init(
+  //     appID: 1793642705,
+  //     appSign: 'd6af0bc5bc48ad0e08bd949eee31f8ddf6431c6e11067ab687673c5ebab06609',
+  //     userID: 'manu17',
+  //     userName: 'Manu Mathew',
+  //     plugins: [ZegoUIKitSignalingPlugin()],
+  //   );
+  // }
 
   void logOutZegoCloud() {
     ZegoUIKitPrebuiltCallInvitationService().uninit();

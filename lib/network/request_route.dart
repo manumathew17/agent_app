@@ -59,4 +59,16 @@ class RequestRouter {
   updateCustomerDetails(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
     _networkRequest.postCall("conferenceUsers/update-conference-user", postBody, requestCallbacks);
   }
+
+  updateUser(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("user/update-user", postBody, requestCallbacks);
+  }
+
+  getAgentTiming(RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("user/call-agent-time", null, requestCallbacks);
+  }
+
+  callInvitation(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("schedulecall/call-invitation", postBody, requestCallbacks);
+  }
 }
