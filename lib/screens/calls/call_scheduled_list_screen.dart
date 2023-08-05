@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lively_studio/utils/general.dart';
+import 'package:lively_studio/widgets/snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -19,9 +21,12 @@ class ScheduledCallListScreen extends StatefulWidget {
 }
 
 class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
+  late GeneralSnackBar _snackBar;
+
   @override
   void initState() {
     Provider.of<CallHistoryProvider>(context, listen: false).getScheduledCall();
+    _snackBar = GeneralSnackBar(context);
     super.initState();
   }
 
@@ -42,7 +47,7 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
                     boxShadow: [generalBoxShadow],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 15, right: 15, top: 25, bottom: 25),
+                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -62,7 +67,7 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
                               height: 5,
                             ),
                             Text(
-                              GeneralUtils.formatDateTime(scheduledCall.callScheduledList[index].startTime),
+                              GeneralUtils.formatDateTime(scheduledCall.callScheduledList[index].start_time_formatted),
                               style: generalText,
                             ),
                             const SizedBox(
@@ -90,10 +95,15 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            var provider = Provider.of<WebSocketProvider>(context, listen: false);
-                            provider.room_id= scheduledCall.callScheduledList[index].room_id;
-                            provider.call_token= scheduledCall.callScheduledList[index].id;
-                            GoRouter.of(context).push("/video-call");
+                            if (_canJoinTheMeet(scheduledCall.callScheduledList[index].start_time_formatted)) {
+                              var provider = Provider.of<WebSocketProvider>(context, listen: false);
+                              provider.room_id = scheduledCall.callScheduledList[index].room_id;
+                              provider.call_token = scheduledCall.callScheduledList[index].id;
+                              provider.isInstantCall = false;
+                              GoRouter.of(context).push("/video-call");
+                            } else {
+                              _snackBar.showErrorSnackBar("Please join the meet on specified time");
+                            }
                           },
                           style: ButtonStyle(
                             foregroundColor: MaterialStateProperty.all<Color>(primaryGreen),
@@ -101,6 +111,44 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
                           ),
                           child: const Text('Join'),
                         ),
+
+                        SizedBox(
+                          width: 1.w,
+                        ),
+
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Ink(
+                              decoration: const ShapeDecoration(
+                                shape: CircleBorder(),
+                              ),
+                              child: IconButton(
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.whatsapp,
+                                  color: Colors.green,
+                                ),
+                                color: primary,
+                                onPressed: () {
+                                  GeneralUtils.openWhatsApp(scheduledCall.callMissedList[index].customerMobileNo, "");
+                                },
+                              ),
+                            ),
+
+                            IconButton(
+                              icon: const Icon(Icons.phone),
+                              color: Colors.black,
+                              onPressed: () {
+                                GeneralUtils.makePhoneCall(scheduledCall.callMissedList[index].customerMobileNo);
+                              },
+                            ),
+
+
+
+
+                          ],
+                        )
                       ],
                     ),
                   ),
@@ -109,5 +157,22 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
             }));
       },
     ));
+  }
+
+  bool _canJoinTheMeet(String dateTimeString) {
+    try {
+      DateTime passedTimeUTC = DateTime.parse(dateTimeString);
+
+      DateTime passedTime = passedTimeUTC.toLocal();
+
+      DateTime now = DateTime.now();
+
+      DateTime rangeStart = passedTime.subtract(const Duration(minutes: 5));
+      DateTime rangeEnd = passedTime.add(const Duration(minutes: 30));
+
+      return now.isAfter(rangeStart) && now.isBefore(rangeEnd);
+    } catch (_) {
+      return false;
+    }
   }
 }

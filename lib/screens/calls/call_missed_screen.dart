@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/model/model_missed_call.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/network/request_route.dart';
 import 'package:lively_studio/provider/call_history_provider.dart';
+import 'package:lively_studio/provider/websocket_provider.dart';
 import 'package:lively_studio/utils/general.dart';
 import 'package:lively_studio/widgets/loader.dart';
 import 'package:lively_studio/widgets/snackbar.dart';
@@ -11,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../app_color.dart';
+import '../../model/model_invite_call.dart';
 import '../../style.dart';
 import '../product/product_detail_screen.dart';
 
@@ -46,7 +52,15 @@ class CallMissedScreenState extends State<CallMissedScreen> {
         postBody,
         RequestCallbacks(
             onSuccess: (response) {
-              _generalSnackBar.showSuccessSnackBar("Invitation sent to customer");
+              _generalSnackBar.showSuccessSnackBar("Invitation sent to customer, Joining to the call");
+              Map<String, dynamic> jsonDatMap = jsonDecode(response);
+              Map<String, dynamic> data = jsonDatMap['data'];
+              InviteCall inviteCall = InviteCall.fromJson(data);
+              Provider.of<WebSocketProvider>(context, listen: false).call_token = inviteCall.id;
+              Provider.of<WebSocketProvider>(context, listen: false).room_id = inviteCall.roomId;
+              Provider.of<WebSocketProvider>(context, listen: false).isInstantCall = false;
+
+              GoRouter.of(context).push("/video-call");
             },
             onError: (error) {}));
   }
@@ -68,7 +82,7 @@ class CallMissedScreenState extends State<CallMissedScreen> {
                     boxShadow: [generalBoxShadow],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 15, right: 15, top: 25, bottom: 25),
+                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -145,21 +159,46 @@ class CallMissedScreenState extends State<CallMissedScreen> {
                               ),
                               child: const Text('Invite'),
                             ),
-                            Ink(
-                              decoration: const ShapeDecoration(
-                                shape: CircleBorder(),
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.chat_rounded,
-                                  color: Colors.black,
-                                ),
-                                color: primary,
-                                onPressed: () {
-                                  GeneralUtils.openWhatsApp(missedCalls.callMissedList[index].customerMobileNo, "");
-                                },
-                              ),
+                            SizedBox(
+                              width: 1.w,
                             ),
+                            
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Ink(
+                                  decoration: const ShapeDecoration(
+                                    shape: CircleBorder(),
+                                  ),
+                                  child: IconButton(
+                                    icon: const FaIcon(
+                                      FontAwesomeIcons.whatsapp,
+                                      color: Colors.green,
+                                    ),
+                                    color: primary,
+                                    onPressed: () {
+                                      GeneralUtils.openWhatsApp(missedCalls.callMissedList[index].customerMobileNo, "");
+                                    },
+                                  ),
+                                ),
+
+                                IconButton(
+                                  icon: const Icon(Icons.phone),
+                                  color: Colors.black,
+                                  onPressed: () {
+                                   GeneralUtils.makePhoneCall(missedCalls.callMissedList[index].customerMobileNo);
+                                  },
+                                ),
+
+
+                                
+
+                              ],
+                            )
+
+               
+
                           ],
                         )
                       ],

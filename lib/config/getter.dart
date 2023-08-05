@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:lively_studio/model/model_company_details.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/model_user_detail.dart';
@@ -11,6 +12,8 @@ class ConfigGetter {
   static String CURRENCY_CODE = "";
   static late UserDetail USERDETAILS;
   static late CompanyDetail COMPANY_DETAILS;
+
+  static late  BuildContext mContext;
 
 
   static Future<Map<String, dynamic>> getStoredAccountDetails() async {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:currency_symbols/currency_symbols.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lively_studio/model/model_customer.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/network/request_route.dart';
@@ -158,6 +159,40 @@ class ChatScreenState extends State<ChatScreen> {
                                           ],
                                         ),
                                       ),
+
+                                      SizedBox(
+                                        width: 1.w,
+                                      ),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Ink(
+                                            decoration: const ShapeDecoration(
+                                              shape: CircleBorder(),
+                                            ),
+                                            child: IconButton(
+                                              icon: const FaIcon(
+                                                FontAwesomeIcons.whatsapp,
+                                                color: Colors.green,
+                                              ),
+                                              color: primary,
+                                              onPressed: () {
+                                                GeneralUtils.openWhatsApp(customerData.customerList[index].customerMobileNo, "");
+                                              },
+                                            ),
+                                          ),
+
+                                          IconButton(
+                                            icon: const Icon(Icons.phone),
+                                            color: Colors.black,
+                                            onPressed: () {
+                                              GeneralUtils.makePhoneCall(customerData.customerList[index].customerMobileNo);
+                                            },
+                                          ),
+                                        ],
+                                      )
                                       //    Text("10:12 PM", style: TextStyle(fontWeight: FontWeight.w200, color: Colors.grey, fontSize: 10))
                                     ],
                                   ),

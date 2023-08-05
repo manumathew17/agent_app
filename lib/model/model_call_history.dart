@@ -7,6 +7,8 @@ class CallHistory {
     required this.callDuration,
     required this.agentName,
     required this.callDateTime,
+    required this.phoneNumber,
+    required this.start_time_formatted
   });
 
   late final String id;
@@ -17,6 +19,7 @@ class CallHistory {
   late final String agentName;
   late final String callDateTime;
   late final String phoneNumber;
+  late final String start_time_formatted;
 
   CallHistory.fromJson(Map<String, dynamic> json) {
     id = json['_id'] ?? "";
@@ -26,7 +29,8 @@ class CallHistory {
     callDuration = json['call_duration'] ?? "NA";
     agentName = json['agent_name'] ?? "NA";
     callDateTime = json['call_date_time'] ?? "NA";
-    phoneNumber = json['phoneNumber'] ?? "NA";
+    phoneNumber = json['customer_mobile_no'] ?? "NA";
+    start_time_formatted = json['start_time_formatted'] ?? 'NA';
   }
 
   Map<String, dynamic> toJson() {

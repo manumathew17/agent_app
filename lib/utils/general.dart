@@ -59,22 +59,56 @@ class GeneralUtils {
     }
   }
 
-  static Future<bool> openWhatsApp(String phoneNumber, String message) async {
-    String encodedMessage = Uri.encodeComponent(message);
-    String url = 'whatsapp://send?phone=$phoneNumber&text=${Uri.encodeComponent(message)}';
-    return await launchUrl(Uri.parse(url));
+  static String convertUtcToLocal(String utcTimeString) {
+    // Parse the UTC time string to DateTime object
+    DateTime utcTime = DateTime.parse(utcTimeString);
+
+    // Get the device's local time zone
+    String localTimeZone = DateTime.now().timeZoneOffset.toString();
+
+    // Calculate the offset in hours and minutes
+    int offsetHours = int.parse(localTimeZone.split(':')[0]);
+    int offsetMinutes = int.parse(localTimeZone.split(':')[1]);
+
+    // Apply the offset to get the local time
+    DateTime localTime = utcTime.add(Duration(hours: offsetHours, minutes: offsetMinutes));
+
+    // Format the local time to the desired format "dd-mm hh:mm a"
+    String formattedTime = DateFormat('dd-MM hh:mm a').format(localTime);
+    return formattedTime;
   }
 
-  static String formatDateTime(String dateTimeString) {
+  static String formatDateTime(String timestamp) {
+    print(timestamp);
     try {
-      DateTime dateTime = DateTime.parse(dateTimeString);
-      String formattedDate = DateFormat('dd-MM').format(dateTime);
-      String formattedTime = DateFormat('hh:mm a').format(dateTime);
-      return '$formattedDate $formattedTime';
+      DateTime parsedDateTime = DateTime.parse(timestamp);
+
+      DateTime localDateTime = parsedDateTime.toLocal();
+
+      String formattedDateTime = DateFormat('dd-MMM hh:mm a').format(localDateTime);
+
+      return formattedDateTime;
     } catch (_) {
       return "NA";
     }
   }
+
+  static Future<bool> openWhatsApp(String phoneNumber, String message) async {
+    print(phoneNumber);
+    String url = 'whatsapp://send?phone=91$phoneNumber}';
+    return await launchUrl(Uri.parse(url));
+  }
+
+  // static String formatDateTime(String dateTimeString) {
+  //   try {
+  //     DateTime dateTime = DateTime.parse(dateTimeString);
+  //     String formattedDate = DateFormat('dd-MM').format(dateTime);
+  //     String formattedTime = DateFormat('hh:mm a').format(dateTime);
+  //     return '$formattedDate $formattedTime';
+  //   } catch (_) {
+  //     return "NA";
+  //   }
+  // }
 
   static TimeOfDay intToTimeOfDay(int hours) {
     try {

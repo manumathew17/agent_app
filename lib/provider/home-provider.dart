@@ -16,18 +16,29 @@ class HomeProvider extends ChangeNotifier {
   List<CallScheduled> scheduledCallList = [];
   bool isOnline = false;
 
-  updateOnlineStatus() {
-    final putBody = {"online": !isOnline};
+  updateOnlineStatus({bool? value}) {
+    bool updatedValue = value ?? !isOnline;
+    final putBody = {"online": updatedValue};
 
     requestRouter.updateOnlineStatus(
         putBody,
         RequestCallbacks(onSuccess: (response) {
           isOnline = !isOnline;
-
           notifyListeners();
         }, onError: (error) {
           print(error);
         }));
+  }
+
+  getUserOnlineStatus(VoidCallback showOfflineDialog) {
+    requestRouter.getUserOnlineStatus(RequestCallbacks(onSuccess: (response) {
+      Map<String, dynamic> jsonDatMap = jsonDecode(response);
+      isOnline = jsonDatMap['data']['online'];
+      if (!isOnline) {
+        showOfflineDialog();
+      }
+      notifyListeners();
+    }, onError: (error) {}));
   }
 
   void getScheduledCall() async {

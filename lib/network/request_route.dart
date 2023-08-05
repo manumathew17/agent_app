@@ -17,7 +17,7 @@ class RequestRouter {
   }
 
   getScheduledCall(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
-    _networkRequest.getCall("schedulecall/getAllScheduleCall", queryParams, requestCallbacks);
+    _networkRequest.getCall("schedulecall/status/active", queryParams, requestCallbacks);
   }
 
   getProductList(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
@@ -41,7 +41,7 @@ class RequestRouter {
   }
 
   updateCallStatus(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
-    _networkRequest.postCall("schedulecall/UpdateCallStatus", postBody, requestCallbacks);
+    _networkRequest.postCall("schedulecall/instant-call/update", postBody, requestCallbacks);
   }
 
   getMissedCall(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
@@ -70,5 +70,13 @@ class RequestRouter {
 
   callInvitation(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
     _networkRequest.postCall("schedulecall/call-invitation", postBody, requestCallbacks);
+  }
+
+  getUserOnlineStatus(RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("user/status", null, requestCallbacks);
+  }
+
+  updateScheduledCallStatus(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
+    _networkRequest.postCall("schedulecall/update", postBody, requestCallbacks);
   }
 }

@@ -1,26 +1,26 @@
 class CompanyDetail {
   String companyName;
-  String url;
+  String? url;
   String companyId;
-  DateTime createdAt;
-  DateTime updatedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
   Currency currency;
-  Website website;
-  CallPluginConfiguration callPluginConfiguration;
+  Website? website;
+  CallPluginConfiguration? callPluginConfiguration;
   String brandLogo;
-  String backgroundImage;
+  String? backgroundImage;
 
   CompanyDetail({
     required this.companyName,
-    required this.url,
+    this.url,
     required this.companyId,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
     required this.currency,
-    required this.website,
-    required this.callPluginConfiguration,
+    this.website,
+    this.callPluginConfiguration,
     required this.brandLogo,
-    required this.backgroundImage,
+    this.backgroundImage,
   });
 
   // Factory method to create an instance of the modal class from JSON data
@@ -31,10 +31,10 @@ class CompanyDetail {
       companyId: json['company_id'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      currency: Currency.fromJson(json['currency']),
+      currency: Currency.fromJson(json['currency'] ?? "NA"),
       website: Website.fromJson(json['website']),
-      callPluginConfiguration: CallPluginConfiguration.fromJson(json['call_plugin_configuration']),
-      brandLogo: json['brand_logo'],
+      //callPluginConfiguration: CallPluginConfiguration.fromJson(json['call_plugin_configuration'] ?? "NA"),
+      brandLogo: json['brand_logo'] ?? 'NA',
       backgroundImage: json['background_image'],
     );
   }

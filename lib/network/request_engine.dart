@@ -118,6 +118,6 @@ class NetworkRequest {
   }
 
   _showInternetError() {
-    _generalSnackBar.showErrorSnackBar("Something went wrong");
+    _generalSnackBar.showErrorSnackBar("Something went wrong, internet not available");
   }
 }

@@ -4,6 +4,7 @@ import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/provider/home-provider.dart';
 import 'package:lively_studio/screens/product/product_detail_screen.dart';
 import 'package:lively_studio/utils/general.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -23,7 +24,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-   // Provider.of<CallHistoryProvider>(context, listen: false).getCallHistory();
+    // Provider.of<CallHistoryProvider>(context, listen: false).getCallHistory();
     Provider.of<CallHistoryProvider>(context, listen: false).getTodayCall();
   }
 
@@ -84,13 +85,13 @@ class HomeScreenState extends State<HomeScreen> {
                               Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus();
                             },
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Text(
-                              "Mon - Fri, 10:00 AM - 6-00 PM",
-                              style: TextStyle(fontSize: 8, fontWeight: FontWeight.w400),
-                            ),
-                          )
+                          // Padding(
+                          //   padding: const EdgeInsets.only(right: 10),
+                          //   child: Text(
+                          //     "Mon - Fri, 10:00 AM - 6-00 PM",
+                          //     style: TextStyle(fontSize: 8, fontWeight: FontWeight.w400),
+                          //   ),
+                          // )
                         ],
                       );
                     })
@@ -98,106 +99,15 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(
-                height: 1.w,
+                height: 20.w,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Text(
-                  "Today's call",
-                  style: heading14,
+                child: Lottie.asset(
+                  'assets/anim/videocall.json',
+                  repeat: true,
                 ),
               ),
-              Expanded(
-                child: ListView.builder(
-                    itemCount: homeProvider.todayCallList.length,
-                    itemBuilder: ((context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                          width: 100.w,
-                          decoration: const BoxDecoration(
-                            color: greyGeneral,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            boxShadow: [generalBoxShadow],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 15, right: 15, top: 25, bottom: 25),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      homeProvider.todayCallList[index].customerName,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      GeneralUtils.getTime(homeProvider.todayCallList[index].callDateTime),
-                                      style: generalText,
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 3, right: 2),
-                                      child: TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => ProductDetailsWebView(
-                                                      productUrl: homeProvider.todayCallList[index].productUrl,
-                                                    )),
-                                          );
-                                        },
-                                        style: ButtonStyle(
-                                          foregroundColor: MaterialStateProperty.all<Color>(primary),
-                                        ),
-                                        child: const Text(
-                                          'View Product',
-                                          style: TextStyle(fontSize: 10),
-                                        ),
-                                      ),
-                                    ),
-                                    Ink(
-                                      decoration: const ShapeDecoration(
-                                        shape: CircleBorder(),
-                                      ),
-                                      child: IconButton(
-                                        icon: const Icon(
-                                          Icons.call_rounded,
-                                          color: Colors.black,
-                                        ),
-                                        color: primary,
-                                        onPressed: () {
-                                          GeneralUtils.makePhoneCall(homeProvider.todayCallList[index].phoneNumber);
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    })),
-              )
             ],
           ),
         );

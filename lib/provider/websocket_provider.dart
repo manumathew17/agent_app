@@ -18,16 +18,20 @@ class WebSocketProvider extends ChangeNotifier {
   late VideoCallRequest videoCallRequest;
   late IOWebSocketChannel webSocketChannel;
   bool showVideoCallInfo = false;
+  bool isButtonDisabled = false;
   late VoidCallback onJoinCallPressed;
 
   String room_id = '';
   String customer_id = '';
   String customer_token = '';
   String call_token = '';
+  bool isInstantCall = true;
 
   updateRoomStatus(status) {}
 
   generateRoomId(VoidCallback onJoinCallPressed) {
+    isButtonDisabled = true;
+    notifyListeners();
     this.onJoinCallPressed = onJoinCallPressed;
     final requestBody = {
       "userDetails": {
@@ -35,12 +39,18 @@ class WebSocketProvider extends ChangeNotifier {
         "mobile_no": videoCallRequest.message.userInfo.mobileNo,
         "email": "yettodo@todo.com"
       },
-      "agentDetails": {"userName": ConfigGetter.USERDETAILS.userId, "email": ConfigGetter.COMPANY_DETAILS.companyName},
+      "agentDetails": {"userName": ConfigGetter.USERDETAILS.userId},
       "product_info": {"product_url": videoCallRequest.message.productInfo.productUrl}
     };
 
     requestRouter.generateRoomId(
-        requestBody, RequestCallbacks(onSuccess: (response) => {generateCallToken(response)}, onError: (error) => {print(error)}));
+        requestBody,
+        RequestCallbacks(
+            onSuccess: (response) => {generateCallToken(response)},
+            onError: (error) {
+              isButtonDisabled = false;
+              notifyListeners();
+            }));
   }
 
   generateCallToken(response) {
@@ -59,22 +69,26 @@ class WebSocketProvider extends ChangeNotifier {
         RequestCallbacks(onSuccess: (response) {
           sendMessageViaSocket();
         }, onError: (error) {
-          print(error);
+          isButtonDisabled = false;
+          notifyListeners();
         }));
   }
 
   showVideoCallRingDialog(Map<String, dynamic> response) {
+    print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee$response");
     Map<String, dynamic> jsonDataMap = jsonDecode(response["data"]);
-    print(jsonDataMap);
+    isInstantCall= true;
 
     videoCallRequest = VideoCallRequest.fromJson(jsonDataMap);
     call_token = videoCallRequest.token;
     showVideoCallInfo = true;
+    _startTimer();
     notifyListeners();
   }
 
   hideVideoCallRingDialog() {
     showVideoCallInfo = false;
+    isButtonDisabled= false;
     onJoinCallPressed();
     notifyListeners();
   }
@@ -122,17 +136,19 @@ class WebSocketProvider extends ChangeNotifier {
       }
     });
 
+    FirebaseMessaging.onBackgroundMessage((message) => showVideoCallRingDialog(message.data));
+
     webSocketChannel.stream.listen(
       (data) {
-        // Process incoming message
+
         print('Incoming message: $data');
       },
       onDone: () {
-        // Connection closed
+
         print('WebSocket connection closed');
       },
       onError: (error) {
-        // Handle errors
+
         print('WebSocket error: $error');
       },
     );
@@ -151,5 +167,14 @@ class WebSocketProvider extends ChangeNotifier {
 
     webSocketChannel.sink.add(jsonEncode(message).toString());
     hideVideoCallRingDialog();
+  }
+
+  _startTimer() {
+    Future.delayed(const Duration(seconds: WAIT_TIME), () {
+      showVideoCallInfo = false;
+      isButtonDisabled= false;
+
+      notifyListeners();
+    });
   }
 }

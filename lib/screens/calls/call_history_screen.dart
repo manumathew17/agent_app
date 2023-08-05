@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lively_studio/screens/product/product_detail_screen.dart';
 import 'package:lively_studio/utils/general.dart';
+import 'package:lively_studio/widgets/call_type_tag.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -41,7 +43,7 @@ class CallHistoryScreenState extends State<CallHistoryScreen> {
                     boxShadow: [generalBoxShadow],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 15, right: 15, top: 25, bottom: 25),
+                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -61,12 +63,13 @@ class CallHistoryScreenState extends State<CallHistoryScreen> {
                               height: 5,
                             ),
                             Text(
-                              GeneralUtils.formatDateTime(callHistoryProvider.callHistoryList[index].callDateTime),
+                              GeneralUtils.formatDateTime(callHistoryProvider.callHistoryList[index].start_time_formatted),
                               style: generalText,
                             ),
                             const SizedBox(
-                              height: 5,
+                              height: 3,
                             ),
+                            CallTypeTag(text: callHistoryProvider.callHistoryList[index].callType)
                           ],
                         ),
                         Row(
@@ -102,21 +105,43 @@ class CallHistoryScreenState extends State<CallHistoryScreen> {
                             //   ),
                             //   child: const Text('Invite'),
                             // ),
-                            Ink(
-                              decoration: const ShapeDecoration(
-                                shape: CircleBorder(),
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.chat_rounded,
-                                  color: Colors.black,
-                                ),
-                                color: primary,
-                                onPressed: () async {
-                                  await GeneralUtils.openWhatsApp(callHistoryProvider.callHistoryList[index].phoneNumber, "");
-                                },
-                              ),
+                            SizedBox(
+                              width: 1.w,
                             ),
+
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Ink(
+                                  decoration: const ShapeDecoration(
+                                    shape: CircleBorder(),
+                                  ),
+                                  child: IconButton(
+                                    icon: const FaIcon(
+                                      FontAwesomeIcons.whatsapp,
+                                      color: Colors.green,
+                                    ),
+                                    color: primary,
+                                    onPressed: () {
+                                      GeneralUtils.openWhatsApp(callHistoryProvider.callMissedList[index].customerMobileNo, "");
+                                    },
+                                  ),
+                                ),
+
+                                IconButton(
+                                  icon: const Icon(Icons.phone),
+                                  color: Colors.black,
+                                  onPressed: () {
+                                    GeneralUtils.makePhoneCall(callHistoryProvider.callMissedList[index].customerMobileNo);
+                                  },
+                                ),
+
+
+
+
+                              ],
+                            )
                           ],
                         )
                       ],

@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/provider/call_history_provider.dart';
 import 'package:lively_studio/provider/catalog_provider.dart';
 import 'package:lively_studio/provider/customer_chat_provider.dart';
@@ -15,6 +16,8 @@ import 'package:lively_studio/screens/video-call/videocall_notification_overlay.
 import 'package:lively_studio/screens/video-call/videocall_screen.dart';
 import 'package:lively_studio/theme.dart';
 import 'package:lively_studio/utils/general.dart';
+import 'package:lively_studio/utils/life-cycle_obsorver.dart';
+import 'package:lively_studio/utils/shared_preference.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:web_socket_channel/io.dart';
@@ -24,16 +27,29 @@ import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import './route/route_config.dart';
 import 'firebase_options.dart';
 
+
+
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
 
   print("Handling a background message: ${message.data}");
 
+  try{
+    Provider.of<WebSocketProvider>(ConfigGetter.mContext,listen: false).showVideoCallRingDialog(message.data);
+  }
+  catch (_){
+
+  }
+
+
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   GeneralUtils.notificationVibrate();
 }
 
@@ -44,11 +60,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  ZegoUIKit().initLog().then((value) {
-    runApp(MyApp(navigatorKey: navigatorKey));
-  });
+   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  runApp(MyApp(navigatorKey: navigatorKey));
+  // ZegoUIKit().initLog().then((value) {
+  //   runApp(MyApp(navigatorKey: navigatorKey));
+  // });
 }
 
 class MyApp extends StatefulWidget {
@@ -64,6 +80,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  final AppLifecycleObserver lifecycleObserver = AppLifecycleObserver();
   @override
   void initState() {
     super.initState();
@@ -91,6 +108,7 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addObserver(lifecycleObserver);
     return Sizer(builder: (context, orientation, deviceType) {
       return MultiProvider(
           providers: [
@@ -115,6 +133,13 @@ class MyAppState extends State<MyApp> {
                     ),
                     Consumer<WebSocketProvider>(
                       builder: (context, videoCall, child) {
+                        try{
+                          ConfigGetter.mContext = widget.navigatorKey.currentState!.context;
+                        }
+                        catch(_){
+                          ConfigGetter.mContext = context;
+                        }
+
                         if (videoCall.showVideoCallInfo) {
                           return VideoCallNotificationPopup(videoCallRequest: videoCall.videoCallRequest, onJoinCallPressed: joinCall);
                         } else {

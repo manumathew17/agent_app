@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lively_studio/config/getter.dart';
@@ -70,6 +69,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _selectFromTime(BuildContext context) async {
+    _endTimeController.text = "";
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -104,7 +104,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   String _formatTime(TimeOfDay time) {
-    String period = time.hourOfPeriod < 12 ? 'AM' : 'PM';
+    String period = time.hour >= 12 ? 'PM' : 'AM';
     int hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
     String minute = time.minute.toString().padLeft(2, '0');
     return '$hour:$minute $period';
@@ -176,7 +176,9 @@ class ProfileScreenState extends State<ProfileScreen> {
         requestBody,
         RequestCallbacks(
             onSuccess: (response) async => {await SharedPreferenceUtility.clearAllStorage(), Loader.hide(), context.go('/login')},
-            onError: (error) => {Loader.hide(), _generalSnackBar.showErrorSnackBar(error)}));
+            onError: (error) => {
+              SharedPreferenceUtility.clearAllStorage(),
+              Loader.hide(), _generalSnackBar.showErrorSnackBar(error)}));
   }
 
   Future<void> _logoutConfirm(BuildContext context) {

@@ -49,7 +49,7 @@ class VideoCallNotificationPopupState extends State<VideoCallNotificationPopup> 
                   ),
                   SizedBox(
                     height: 60.w,
-                    child:  WebView(
+                    child: WebView(
                       backgroundColor: Colors.white,
                       javascriptMode: JavascriptMode.disabled,
                       initialUrl: widget.videoCallRequest.message.productInfo.productUrl,
@@ -61,12 +61,15 @@ class VideoCallNotificationPopupState extends State<VideoCallNotificationPopup> 
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: FilledButton(
-                          onPressed: () {
-                            Provider.of<WebSocketProvider>(context, listen: false).generateRoomId(widget.onJoinCallPressed);
-
+                        child: Consumer<WebSocketProvider>(
+                          builder: (context, provider, child) {
+                            return FilledButton(
+                              onPressed: () {
+                                provider.isButtonDisabled ? null : provider.generateRoomId(widget.onJoinCallPressed);
+                              },
+                              child: const Text('Join call'),
+                            );
                           },
-                          child: const Text('Join call'),
                         ),
                       )
                     ],

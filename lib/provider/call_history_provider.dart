@@ -18,8 +18,11 @@ class CallHistoryProvider extends ChangeNotifier {
   List<CallHistory> todayCallList = [];
 
   void getScheduledCall() async {
+    final queryParams = {
+      "self":'true'
+    };
     await requestRouter.getScheduledCall(
-        null,
+        queryParams,
         RequestCallbacks(
             onSuccess: (response) => {_createList(response)},
             onError: (error) {
@@ -40,8 +43,12 @@ class CallHistoryProvider extends ChangeNotifier {
   }
 
   void getCallHistory() async {
+    final queryParams = {
+      "self":'true',
+      "limit":"100"
+    };
     await requestRouter.getCallHistory(
-        null, RequestCallbacks(onSuccess: (response) => {_createCallHistoryList(response)}, onError: (error) => {Logger.log(error)}));
+        queryParams, RequestCallbacks(onSuccess: (response) => {_createCallHistoryList(response)}, onError: (error) => {Logger.log(error)}));
   }
 
   void getTodayCall() {
@@ -51,11 +58,11 @@ class CallHistoryProvider extends ChangeNotifier {
     String endDate = DateFormat('yyyy-MM-dd').format(nextDay);
     final queryParams = {
       "start_date": startDate,
-      "end_date" : endDate
+      "end_date" : endDate,
+      "limit":"100"
     };
 
     requestRouter.getCallHistory(queryParams, RequestCallbacks(onSuccess: (response){
-      print(response);
       Map<String, dynamic> jsonDataMap = jsonDecode(response);
       List<dynamic> data = jsonDataMap['data']['callHistory'];
       todayCallList = data.map((item) => CallHistory.fromJson(item)).toList();
@@ -75,8 +82,9 @@ class CallHistoryProvider extends ChangeNotifier {
   }
 
   _createList(response) {
+    //todo asc by time of schedule call and only show yet to join call entry
     Map<String, dynamic> jsonDataMap = jsonDecode(response);
-    List<dynamic> data = jsonDataMap['data'];
+    List<dynamic> data = jsonDataMap['data']['activeScheduleCalls'];
     List<dynamic> filteredData = data.where((item) => item['call_type'] != 'instant').toList();
     callScheduledList = filteredData.map((item) => CallScheduled.fromJson(item)).toList();
     notifyListeners();

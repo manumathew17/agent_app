@@ -31,7 +31,7 @@ class DashBoardScreen extends StatefulWidget {
 }
 
 class DashBoardScreenState extends State<DashBoardScreen> {
-  bool light1 = true;
+  bool isOfflineConfirmShown = false;
   String tokenId = "Token";
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -44,29 +44,73 @@ class DashBoardScreenState extends State<DashBoardScreen> {
 
   bool isPlaying = false;
 
-  static const List<Widget> _homeScreensWidgets = [
-    HomeScreen(),
-    CallScreen(),
-    ChatScreen(),
-    ProductCatalog(),
-    ProfileScreen()
-  ];
+  static const List<Widget> _homeScreensWidgets = [HomeScreen(), CallScreen(), ChatScreen(), ProductCatalog(), ProfileScreen()];
 
   @override
   void initState() {
     setupInteractedMessage();
-    _updateOnlineStatus();
+    _onlineStatus();
+    Provider.of<HomeProvider>(context, listen: false).getUserOnlineStatus(() {_showOfflineConfirmation(); });
     super.initState();
   }
 
-  _updateOnlineStatus() {
-    Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus();
+  _onlineStatus() {
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
 
+
+
+
+    homeProvider.addListener(() {
+      bool isOnline = homeProvider.isOnline;
+      if (!isOnline && !isOfflineConfirmShown) {
+        isOfflineConfirmShown = true;
+        _showOfflineConfirmation();
+      }
+    });
   }
 
+  Future<void> _showOfflineConfirmation() {
+    isOfflineConfirmShown = true;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Offline'),
+          content: const Text('You are offline please make it online'),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text(
+                'Online',
+                style: TextStyle(color: Colors.green),
+              ),
+              onPressed: () {
+                _updateOnlineStatus();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _updateOnlineStatus() {
+    Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus(value: true);
+  }
 
   Future<void> setupInteractedMessage() async {
-
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
@@ -78,7 +122,6 @@ class DashBoardScreenState extends State<DashBoardScreen> {
   void _handleMessage(RemoteMessage message) {
     Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(message.data);
   }
-
 
   // _joinCall() {
   //   if (ZegoUIKitPrebuiltCallMiniOverlayMachine().isMinimizing) {

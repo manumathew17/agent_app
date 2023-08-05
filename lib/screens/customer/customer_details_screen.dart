@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lively_studio/app_color.dart';
 import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/model/model_customer_data.dart';
@@ -100,7 +101,10 @@ class CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                             shape: CircleBorder(),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.chat),
+                            icon: const FaIcon(
+                              FontAwesomeIcons.whatsapp,
+                              color: Colors.green,
+                            ),
                             color: primary,
                             onPressed: () {
                               GeneralUtils.openWhatsApp(customerProvider.customer.customerMobileNo,
