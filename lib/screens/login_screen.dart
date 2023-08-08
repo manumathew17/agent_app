@@ -14,8 +14,10 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 
 import '../app_color.dart';
+import '../config/const.dart';
 import '../provider/websocket_provider.dart';
 import '../style.dart';
+import '../utils/notification/notification_controller.dart';
 import '../widgets/loader.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -212,7 +214,7 @@ class LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'version 1.1.0',
+                    'version $APP_VERSION',
                     style: generalText,
                   )
                 ],

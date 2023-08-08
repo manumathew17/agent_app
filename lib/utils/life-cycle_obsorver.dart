@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lively_studio/utils/notification/notification_controller.dart';
 import 'package:lively_studio/utils/shared_preference.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import '../route/route_config.dart';
 
 class AppLifecycleObserver with WidgetsBindingObserver {
   void onAppForegrounded() {
+    NotificationController.cancelMissedCallNotifications();
     //Provider.of<WebSocketProvider>(navigatorKey.currentState!.context, listen: false).setupInteractedMessage();
   }
 

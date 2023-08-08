@@ -131,7 +131,7 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
                                 ),
                                 color: primary,
                                 onPressed: () {
-                                  GeneralUtils.openWhatsApp(scheduledCall.callMissedList[index].customerMobileNo, "");
+                                  GeneralUtils.openWhatsApp(scheduledCall.callScheduledList[index].customerMobileNo, "");
                                 },
                               ),
                             ),
@@ -140,7 +140,7 @@ class ScheduledCallListScreenState extends State<ScheduledCallListScreen> {
                               icon: const Icon(Icons.phone),
                               color: Colors.black,
                               onPressed: () {
-                                GeneralUtils.makePhoneCall(scheduledCall.callMissedList[index].customerMobileNo);
+                                GeneralUtils.makePhoneCall(scheduledCall.callScheduledList[index].customerMobileNo);
                               },
                             ),
 

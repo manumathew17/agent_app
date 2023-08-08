@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +20,7 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../app_color.dart';
 import '../../provider/websocket_provider.dart';
 import '../../style.dart';
+import '../../utils/notification/notification_controller.dart';
 import '../../widgets/progress_bar.dart';
 import '../calls/calls_screen.dart';
 import '../product/catalog_screen.dart';
@@ -51,6 +53,7 @@ class DashBoardScreenState extends State<DashBoardScreen> {
     setupInteractedMessage();
     _onlineStatus();
     Provider.of<HomeProvider>(context, listen: false).getUserOnlineStatus(() {_showOfflineConfirmation(); });
+    NotificationController.initializeLocalNotifications();
     super.initState();
   }
 
@@ -110,13 +113,36 @@ class DashBoardScreenState extends State<DashBoardScreen> {
     Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus(value: true);
   }
 
+  @pragma('vm:entry-point')
+  Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+    print('uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
+
+    Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(receivedAction.payload!.cast<String, dynamic>());
+
+
+
+  }
+
   Future<void> setupInteractedMessage() async {
+
+
+
+
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: onActionReceivedMethod,
+    );
+
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+
+
   }
 
   void _handleMessage(RemoteMessage message) {

@@ -24,7 +24,8 @@ class VideoCallScreenState extends State<VideoCallScreen> {
   late GeneralSnackBar _generalSnackBar;
 
   _updateRoomStatus(status, BuildContext ctx) {
-    if (Provider.of<WebSocketProvider>(context, listen: false).isInstantCall) {
+    callToken = Provider.of<WebSocketProvider>(ctx, listen: false).call_token;
+    if (Provider.of<WebSocketProvider>(ctx, listen: false).isInstantCall) {
       final requestBody = {'token': callToken, 'call_status': status};
       requestRouter.updateCallStatus(
           requestBody,
@@ -61,6 +62,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
     _generalSnackBar = GeneralSnackBar(context);
     callToken = Provider.of<WebSocketProvider>(context, listen: false).call_token;
     _updateRoomStatus(2, context);
+    ConfigGetter.isCallAttended = true;
   }
 
   // @override

@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lively_studio/config/const.dart';
 import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/provider/websocket_provider.dart';
 import 'package:lively_studio/screens/home/dashboard_screen.dart';
@@ -46,7 +47,7 @@ class SplashScreenState extends State<SplashScreen> {
             const Padding(
               padding: EdgeInsets.only(bottom: 16.0),
               child: Text(
-                'version 1.1.0',
+                'version $APP_VERSION',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,

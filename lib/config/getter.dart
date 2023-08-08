@@ -16,6 +16,9 @@ class ConfigGetter {
   static late  BuildContext mContext;
 
 
+  static bool isCallAttended = false;
+
+
   static Future<Map<String, dynamic>> getStoredAccountDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String json = prefs.getString(PREF_USER) ?? "";

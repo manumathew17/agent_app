@@ -12,6 +12,7 @@ import '../config/const.dart';
 import '../config/getter.dart';
 import '../model/model_video_call_request.dart';
 import '../utils/general.dart';
+import '../utils/notification/notification_controller.dart';
 
 class WebSocketProvider extends ChangeNotifier {
   RequestRouter requestRouter = RequestRouter();
@@ -75,7 +76,7 @@ class WebSocketProvider extends ChangeNotifier {
   }
 
   showVideoCallRingDialog(Map<String, dynamic> response) {
-    print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee$response");
+    ConfigGetter.isCallAttended = false;
     Map<String, dynamic> jsonDataMap = jsonDecode(response["data"]);
     isInstantCall= true;
 
@@ -130,11 +131,14 @@ class WebSocketProvider extends ChangeNotifier {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
       showVideoCallRingDialog(message.data);
+      //NotificationController.createNewNotification(message.data);
       GeneralUtils.notificationVibrate();
+
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');
       }
     });
+
 
     FirebaseMessaging.onBackgroundMessage((message) => showVideoCallRingDialog(message.data));
 

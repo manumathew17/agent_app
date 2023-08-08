@@ -124,7 +124,7 @@ class CallHistoryScreenState extends State<CallHistoryScreen> {
                                     ),
                                     color: primary,
                                     onPressed: () {
-                                      GeneralUtils.openWhatsApp(callHistoryProvider.callMissedList[index].customerMobileNo, "");
+                                      GeneralUtils.openWhatsApp(callHistoryProvider.callHistoryList[index].phoneNumber, "");
                                     },
                                   ),
                                 ),
@@ -133,7 +133,7 @@ class CallHistoryScreenState extends State<CallHistoryScreen> {
                                   icon: const Icon(Icons.phone),
                                   color: Colors.black,
                                   onPressed: () {
-                                    GeneralUtils.makePhoneCall(callHistoryProvider.callMissedList[index].customerMobileNo);
+                                    GeneralUtils.makePhoneCall(callHistoryProvider.callHistoryList[index].phoneNumber);
                                   },
                                 ),
 

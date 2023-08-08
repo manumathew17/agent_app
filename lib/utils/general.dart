@@ -16,8 +16,8 @@ class GeneralUtils {
 
   static notificationVibrate() async {
     try {
-      Vibration.vibrate(duration: 1000);
-      FlutterRingtonePlayer.play(fromAsset: "assets/audio/alarm.mp3");
+      Vibration.vibrate(duration: 5000);
+      FlutterRingtonePlayer.play(fromAsset: "assets/audio/alarm.mp3",asAlarm: true);
     } catch (e) {
       print('Error vibrate : $e');
     }

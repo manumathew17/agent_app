@@ -31,8 +31,12 @@ class CallHistoryProvider extends ChangeNotifier {
   }
 
    getMissedCall() async {
+     final queryParams = {
+       "self":'true',
+       "limit":"100"
+     };
     await requestRouter.getMissedCall(
-        null,
+        queryParams,
         RequestCallbacks(
             onSuccess: (response) {
               _createMissedCallList(response);
