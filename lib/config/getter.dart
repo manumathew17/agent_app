@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:lively_studio/model/model_company_details.dart';
 import 'package:shared_preferences/shared_preferences.dart';

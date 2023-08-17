@@ -15,8 +15,11 @@ class CatalogProvider extends ChangeNotifier {
   bool isLoading = true;
 
   getProductsList() {
+    final queryParams = {
+      "limit":"100"
+    };
     requestRouter.getProductList(
-        null,
+        queryParams,
         RequestCallbacks(
             onSuccess: (response) => _createList(response),
             onError: (error) => {Logger.log(error)}));

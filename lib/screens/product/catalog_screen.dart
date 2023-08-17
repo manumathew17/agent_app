@@ -177,7 +177,7 @@ class ProductCatalogState extends State<ProductCatalog> {
                                                 fontSize: 14),
                                           ),
                                           Text(
-                                            "${cSymbol(ConfigGetter.COMPANY_DETAILS.currency.currencyCode)} ${catalogProvider.filteredProductList[index].price}",
+                                            "${cSymbol(ConfigGetter.COMPANY_DETAILS.currency.currencyCode)} ${GeneralUtils.getPrice(catalogProvider.filteredProductList[index].price)}",
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color: darkGreen,

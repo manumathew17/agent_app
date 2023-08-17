@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:intl/intl.dart';
+import 'package:lively_studio/config/getter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 
@@ -17,9 +18,24 @@ class GeneralUtils {
   static notificationVibrate() async {
     try {
       Vibration.vibrate(duration: 5000);
-      FlutterRingtonePlayer.play(fromAsset: "assets/audio/alarm.mp3",asAlarm: true);
+      FlutterRingtonePlayer.play(fromAsset: "assets/audio/alarm.mp3", asAlarm: true);
     } catch (e) {
       print('Error vibrate : $e');
+    }
+  }
+
+  static String getPrice(price) {
+    try {
+      if (ConfigGetter.COMPANY_DETAILS.website!.type == 1) {
+        int paisaValue = int.parse(price);
+        double rupeeValue = paisaValue / 100.0;
+        return rupeeValue.toString();
+      } else {
+        return price;
+      }
+    } catch (ex) {
+      print(ex.toString());
+      return price;
     }
   }
 
