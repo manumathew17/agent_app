@@ -16,6 +16,7 @@ import '../../model/model_agent_availability.dart';
 import '../../network/callback.dart';
 import '../../provider/home-provider.dart';
 import '../../style.dart';
+import '../../utils/notification/notification_controller.dart';
 import '../../widgets/loader.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -167,6 +168,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   _logOut() async {
+    NotificationController.cancelAllNotification();
     Loader.show(context);
     final requestBody = {
       'fcm_token': " ",

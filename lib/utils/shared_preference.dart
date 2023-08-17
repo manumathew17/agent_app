@@ -45,4 +45,18 @@ class SharedPreferenceUtility {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
   }
+
+  static setCallAttended(bool attended) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+
+    await prefs.setBool(PREF_CALL_ATTENDED, attended);
+  }
+
+  static Future<bool> getCallAttended() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool attended = prefs.getBool(PREF_CALL_ATTENDED) ?? false;
+
+    return attended;
+  }
 }

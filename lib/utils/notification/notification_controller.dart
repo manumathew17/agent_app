@@ -1,5 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:lively_studio/utils/shared_preference.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/const.dart';
 import '../../config/getter.dart';
@@ -133,8 +135,8 @@ class NotificationController {
   ///     NOTIFICATION CREATION METHODS
   ///  *********************************************
   ///
-  static Future<void> createNewNotification(Map<String, dynamic> data) async {
-    Map<String, String?> payload = Map<String, String?>.from(data);
+  static Future<void> createNewNotification() async {
+    SharedPreferenceUtility.setCallAttended(false);
 
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) isAllowed = await displayNotificationRationale();
@@ -149,7 +151,6 @@ class NotificationController {
           locked: true,
           autoDismissible: false,
           body: "Click to open details",
-          payload: payload,
           // bigPicture: 'https://storage.googleapis.com/cms-storage-bucket/d406c736e7c4c57f5f61.png',
           // largeIcon: 'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
           //'asset://assets/images/balloons-in-sky.jpg',
@@ -163,13 +164,12 @@ class NotificationController {
           //     requireInputText: true,
           //     actionType: ActionType.SilentAction
           // ),
-          // NotificationActionButton(
-          //     key: 'ACCEPT', label: 'Accept', actionType: ActionType.DismissAction, isDangerousOption: false, color: Colors.green)
+          NotificationActionButton(key: 'ACCEPT', label: 'Accept', actionType: ActionType.Default, isDangerousOption: false, color: Colors.green)
         ]);
 
     await Future.delayed(const Duration(seconds: WAIT_TIME));
     cancelNotifications();
-    if (!ConfigGetter.isCallAttended) {
+    if (!await SharedPreferenceUtility.getCallAttended()) {
       createMissedCallNotification();
     }
   }

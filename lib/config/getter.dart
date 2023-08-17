@@ -12,11 +12,9 @@ class ConfigGetter {
   static late UserDetail USERDETAILS;
   static late CompanyDetail COMPANY_DETAILS;
 
-  static late  BuildContext mContext;
-
+  static late BuildContext mContext;
 
   static bool isCallAttended = false;
-
 
   static Future<Map<String, dynamic>> getStoredAccountDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,4 +25,7 @@ class ConfigGetter {
     }
     return {};
   }
+
+
+
 }

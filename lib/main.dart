@@ -22,12 +22,14 @@ import 'package:lively_studio/utils/life-cycle_obsorver.dart';
 import 'package:lively_studio/utils/notification/notification_controller.dart';
 import 'package:lively_studio/utils/shared_preference.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import './route/route_config.dart';
+import 'config/const.dart';
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -39,14 +41,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // NotificationController.cancelAllNotification();
 
   try {
-    Provider.of<WebSocketProvider>(navigatorKey.currentContext!, listen: false).showVideoCallRingDialog(message.data);
-  } catch (_) {}
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+    await prefs.setString(PREF_NOTIFICATION, message.data["data"]);
+    await prefs.setString(PREF_CALL_TIME, message.sentTime.toString());
+
+    String notificationData = prefs.getString(PREF_NOTIFICATION) ?? "";
+    print("------------------------------------------------------------------------------");
+    print(notificationData);
+  } catch (ex) {
+    Logger.log(ex.toString());
+  }
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  //NotificationController.createNewNotification(message.data);
+  NotificationController.createNewNotification();
   GeneralUtils.notificationVibrate();
 }
 
@@ -79,42 +90,68 @@ class MyApp extends StatefulWidget {
   MyAppState createState() => MyAppState();
 }
 
-class MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final AppLifecycleObserver lifecycleObserver = AppLifecycleObserver();
+
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     //setUpInteractedMessage();
   }
 
-
-  Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    print('uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
-
-    print(receivedAction.payload.toString());
-    Provider.of<WebSocketProvider>(widget.navigatorKey.currentState!.context, listen: false).showVideoCallRingDialog(receivedAction.payload!.cast<String, dynamic>());
-
-
-
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
-  Future<void> setUpInteractedMessage() async {
-    AwesomeNotifications().setListeners(
-      onActionReceivedMethod: onActionReceivedMethod,
-    );
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        Provider.of<WebSocketProvider>(widget.navigatorKey.currentState!.context, listen: false).checkNotification();
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+        break;
+      case AppLifecycleState.paused:
+        print("app in paused");
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        break;
     }
   }
 
-  void _handleMessage(RemoteMessage message) {
-    Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(message.data);
-  }
+  // Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+  //   print('uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
+  //
+  //   print(receivedAction.payload.toString());
+  //   Provider.of<WebSocketProvider>(widget.navigatorKey.currentState!.context, listen: false)
+  //       .showVideoCallRingDialog(receivedAction.payload!.cast<String, dynamic>());
+  // }
+  //
+  // Future<void> setUpInteractedMessage() async {
+  //   AwesomeNotifications().setListeners(
+  //     onActionReceivedMethod: onActionReceivedMethod,
+  //   );
+  //   RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  //
+  //   if (initialMessage != null) {
+  //     _handleMessage(initialMessage);
+  //   }
+  // }
+  //
+  // void _handleMessage(RemoteMessage message) {
+  //   Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(message.data);
+  // }
 
   void joinCall() {
+    SharedPreferenceUtility.setCallAttended(true);
     if (ZegoUIKitPrebuiltCallMiniOverlayMachine().isMinimizing) {
       return;
     }

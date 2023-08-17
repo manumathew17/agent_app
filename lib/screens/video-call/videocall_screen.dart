@@ -6,9 +6,12 @@ import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/network/request_route.dart';
 import 'package:lively_studio/provider/websocket_provider.dart';
+import 'package:lively_studio/utils/notification/notification_controller.dart';
 import 'package:lively_studio/widgets/snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+
+import '../../utils/shared_preference.dart';
 
 class VideoCallScreen extends StatefulWidget {
   const VideoCallScreen({super.key});
@@ -62,7 +65,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
     _generalSnackBar = GeneralSnackBar(context);
     callToken = Provider.of<WebSocketProvider>(context, listen: false).call_token;
     _updateRoomStatus(2, context);
-    ConfigGetter.isCallAttended = true;
+    NotificationController.cancelAllNotification();
   }
 
   // @override

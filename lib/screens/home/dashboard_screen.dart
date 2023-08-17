@@ -50,7 +50,7 @@ class DashBoardScreenState extends State<DashBoardScreen> {
 
   @override
   void initState() {
-    setupInteractedMessage();
+
     _onlineStatus();
     Provider.of<HomeProvider>(context, listen: false).getUserOnlineStatus(() {_showOfflineConfirmation(); });
     NotificationController.initializeLocalNotifications();
@@ -113,41 +113,6 @@ class DashBoardScreenState extends State<DashBoardScreen> {
     Provider.of<HomeProvider>(context, listen: false).updateOnlineStatus(value: true);
   }
 
-  @pragma('vm:entry-point')
-  Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    print('uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
-
-    Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(receivedAction.payload!.cast<String, dynamic>());
-
-
-
-  }
-
-  Future<void> setupInteractedMessage() async {
-
-
-
-
-    AwesomeNotifications().setListeners(
-      onActionReceivedMethod: onActionReceivedMethod,
-    );
-
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-
-
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
-    }
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-
-
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    Provider.of<WebSocketProvider>(context, listen: false).showVideoCallRingDialog(message.data);
-  }
 
   // _joinCall() {
   //   if (ZegoUIKitPrebuiltCallMiniOverlayMachine().isMinimizing) {

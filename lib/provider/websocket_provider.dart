@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/network/request_route.dart';
 import 'package:lively_studio/utils/Logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 
 import '../config/const.dart';
@@ -18,6 +19,8 @@ class WebSocketProvider extends ChangeNotifier {
   RequestRouter requestRouter = RequestRouter();
   late VideoCallRequest videoCallRequest;
   late IOWebSocketChannel webSocketChannel;
+  bool isWebSocketConnected = false;
+  Timer? _timer;
   bool showVideoCallInfo = false;
   bool isButtonDisabled = false;
   late VoidCallback onJoinCallPressed;
@@ -76,15 +79,16 @@ class WebSocketProvider extends ChangeNotifier {
   }
 
   showVideoCallRingDialog(Map<String, dynamic> response) {
-    Logger.log("Called showVideoCallRingDialog");
     ConfigGetter.isCallAttended = false;
-    Map<String, dynamic> jsonDataMap = jsonDecode(response["data"]);
+    Map<String, dynamic> jsonDataMap = response;
     isInstantCall = true;
 
     videoCallRequest = VideoCallRequest.fromJson(jsonDataMap);
     call_token = videoCallRequest.token;
     showVideoCallInfo = true;
     _startTimer();
+    _timer?.cancel();
+    clearCallRequestData();
     notifyListeners();
   }
 
@@ -96,6 +100,10 @@ class WebSocketProvider extends ChangeNotifier {
   }
 
   initialiseWebSocket() async {
+    if (isWebSocketConnected) {
+      return;
+    }
+
     webSocketChannel = IOWebSocketChannel.connect('$WEB_SOCKET_URL?id=${ConfigGetter.USERDETAILS.userId}&type=cms');
 
     webSocketChannel.stream.listen(
@@ -103,12 +111,15 @@ class WebSocketProvider extends ChangeNotifier {
         print('Incoming message: $data');
       },
       onDone: () {
+        isWebSocketConnected = false;
         print('WebSocket connection closed');
       },
       onError: (error) {
-        print('WebSocket error: $error');
+        isWebSocketConnected = false;
       },
     );
+
+    isWebSocketConnected = true;
   }
 
   fcmNotificationInit() async {
@@ -145,17 +156,17 @@ class WebSocketProvider extends ChangeNotifier {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
+
       print('Message data: ${message.data}');
-      showVideoCallRingDialog(message.data);
-      NotificationController.createNewNotification(message.data);
+
+      showVideoCallRingDialog(jsonDecode(message.data["data"]));
+      NotificationController.createNewNotification();
       GeneralUtils.notificationVibrate();
 
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');
       }
     });
-
-    FirebaseMessaging.onBackgroundMessage((message) => showVideoCallRingDialog(message.data));
   }
 
   sendMessageViaSocket() {
@@ -176,7 +187,48 @@ class WebSocketProvider extends ChangeNotifier {
       showVideoCallInfo = false;
       isButtonDisabled = false;
 
+      _timer?.cancel();
+
       notifyListeners();
     });
+  }
+
+  Future<void> checkData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+    String notificationData = prefs.getString(PREF_NOTIFICATION) ?? "";
+    String savedTimeString = prefs.getString(PREF_CALL_TIME) ?? "";
+    print(notificationData);
+
+    if (notificationData != "" && savedTimeString != "") {
+      DateTime savedTime = DateTime.parse(savedTimeString);
+      DateTime currentTime = DateTime.now();
+
+      Duration difference = currentTime.difference(savedTime);
+
+      if (difference.inSeconds <= 30) {
+        showVideoCallRingDialog(json.decode(notificationData));
+      } else {
+        clearCallRequestData();
+      }
+    }
+  }
+
+  Future<void> checkNotification() async {
+    const duration = Duration(seconds: 1);
+    _timer?.cancel();
+
+    _timer = Timer.periodic(duration, (timer) {
+      checkData();
+    });
+  }
+
+  clearCallRequestData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+    _timer?.cancel();
+
+    await prefs.remove(PREF_NOTIFICATION);
+    await prefs.remove(PREF_CALL_TIME);
   }
 }

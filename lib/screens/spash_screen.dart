@@ -6,9 +6,12 @@ import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/provider/websocket_provider.dart';
 import 'package:lively_studio/screens/home/dashboard_screen.dart';
 import 'package:lively_studio/screens/login_screen.dart';
+
 import 'package:lively_studio/utils/shared_preference.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+
+import '../utils/notification/notification_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,11 +21,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-
-
   @override
   void initState() {
-
     _checkIsLoggedInOrNot();
     super.initState();
   }
@@ -63,8 +63,15 @@ class SplashScreenState extends State<SplashScreen> {
   void _checkIsLoggedInOrNot() async {
     await Future.delayed(const Duration(seconds: 1));
 
-    SharedPreferenceUtility.getStoredAccountDetails().then((valid) => {
-          if (valid) {Provider.of<WebSocketProvider>(context, listen: false).fcmNotificationInit(), context.go('/dashboard')} else {context.go('/login')}
-        });
+    SharedPreferenceUtility.getStoredAccountDetails().then((valid) {
+      if (valid) {
+        Provider.of<WebSocketProvider>(context, listen: false).fcmNotificationInit();
+        Provider.of<WebSocketProvider>(context, listen: false).checkNotification();
+        NotificationController.cancelAllNotification();
+        context.go('/dashboard');
+      } else {
+        context.go('/login');
+      }
+    });
   }
 }
