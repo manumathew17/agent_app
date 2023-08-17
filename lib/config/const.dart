@@ -7,4 +7,4 @@ const ZEGO_APP_ID = 1793642705;
 const int WAIT_TIME = 30; // in sec
 const int MAX_CALL_TIME= 15; //min
 
-const APP_VERSION = "1.1.1";
+const APP_VERSION = "1.1.2";

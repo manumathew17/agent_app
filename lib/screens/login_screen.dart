@@ -59,7 +59,7 @@ class LoginScreenState extends State<LoginScreen> {
     requestRouter.getCurrencyCode(RequestCallbacks(
         onSuccess: (response) async => {
               await SharedPreferenceUtility.storeCompanyDetails(jsonEncode(jsonDecode(response)["data"])),
-              Provider.of<WebSocketProvider>(context, listen: false).weSocketListener(),
+              Provider.of<WebSocketProvider>(context, listen: false).fcmNotificationInit(),
               context.go('/dashboard')
             },
         onError: (error) => {_generalSnackBar.showErrorSnackBar(error)}));

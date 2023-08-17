@@ -64,7 +64,7 @@ class SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 1));
 
     SharedPreferenceUtility.getStoredAccountDetails().then((valid) => {
-          if (valid) {Provider.of<WebSocketProvider>(context, listen: false).weSocketListener(), context.go('/dashboard')} else {context.go('/login')}
+          if (valid) {Provider.of<WebSocketProvider>(context, listen: false).fcmNotificationInit(), context.go('/dashboard')} else {context.go('/login')}
         });
   }
 }

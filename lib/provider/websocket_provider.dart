@@ -76,9 +76,10 @@ class WebSocketProvider extends ChangeNotifier {
   }
 
   showVideoCallRingDialog(Map<String, dynamic> response) {
+    Logger.log("Called showVideoCallRingDialog");
     ConfigGetter.isCallAttended = false;
     Map<String, dynamic> jsonDataMap = jsonDecode(response["data"]);
-    isInstantCall= true;
+    isInstantCall = true;
 
     videoCallRequest = VideoCallRequest.fromJson(jsonDataMap);
     call_token = videoCallRequest.token;
@@ -89,13 +90,28 @@ class WebSocketProvider extends ChangeNotifier {
 
   hideVideoCallRingDialog() {
     showVideoCallInfo = false;
-    isButtonDisabled= false;
+    isButtonDisabled = false;
     onJoinCallPressed();
     notifyListeners();
   }
 
-  weSocketListener() async {
+  initialiseWebSocket() async {
     webSocketChannel = IOWebSocketChannel.connect('$WEB_SOCKET_URL?id=${ConfigGetter.USERDETAILS.userId}&type=cms');
+
+    webSocketChannel.stream.listen(
+      (data) {
+        print('Incoming message: $data');
+      },
+      onDone: () {
+        print('WebSocket connection closed');
+      },
+      onError: (error) {
+        print('WebSocket error: $error');
+      },
+    );
+  }
+
+  fcmNotificationInit() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     NotificationSettings settings = await messaging.requestPermission(
@@ -131,7 +147,7 @@ class WebSocketProvider extends ChangeNotifier {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
       showVideoCallRingDialog(message.data);
-      //NotificationController.createNewNotification(message.data);
+      NotificationController.createNewNotification(message.data);
       GeneralUtils.notificationVibrate();
 
       if (message.notification != null) {
@@ -139,29 +155,11 @@ class WebSocketProvider extends ChangeNotifier {
       }
     });
 
-
     FirebaseMessaging.onBackgroundMessage((message) => showVideoCallRingDialog(message.data));
-
-    webSocketChannel.stream.listen(
-      (data) {
-
-        print('Incoming message: $data');
-      },
-      onDone: () {
-
-        print('WebSocket connection closed');
-      },
-      onError: (error) {
-
-        print('WebSocket error: $error');
-      },
-    );
-    Timer.periodic(const Duration(minutes: 1), (Timer timer) {
-      webSocketChannel.sink.add('ping'); // Send a ping message
-    });
   }
 
   sendMessageViaSocket() {
+    initialiseWebSocket();
     final message = {
       "action": "sendMessage",
       "message": {"status": "success", "roomId": videoCallRequest.ROOM_ID},
@@ -176,7 +174,7 @@ class WebSocketProvider extends ChangeNotifier {
   _startTimer() {
     Future.delayed(const Duration(seconds: WAIT_TIME), () {
       showVideoCallInfo = false;
-      isButtonDisabled= false;
+      isButtonDisabled = false;
 
       notifyListeners();
     });
