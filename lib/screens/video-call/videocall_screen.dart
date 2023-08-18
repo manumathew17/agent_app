@@ -10,6 +10,7 @@ import 'package:lively_studio/utils/notification/notification_controller.dart';
 import 'package:lively_studio/widgets/snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 
 import '../../utils/shared_preference.dart';
 
@@ -95,6 +96,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
             userName: ConfigGetter.USERDETAILS.user_name,
             callID: Provider.of<WebSocketProvider>(context).room_id,
             controller: callController,
+            plugins: [ZegoUIKitSignalingPlugin()],
             config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
               ..onOnlySelfInRoom = (context) {
                 if (PrebuiltCallMiniOverlayPageState.idle != ZegoUIKitPrebuiltCallMiniOverlayMachine().state()) {
@@ -114,6 +116,7 @@ class VideoCallScreenState extends State<VideoCallScreen> {
                 ZegoMenuBarButtonName.hangUpButton,
                 ZegoMenuBarButtonName.minimizingButton,
                 ZegoMenuBarButtonName.toggleCameraButton,
+                ZegoMenuBarButtonName.chatButton,
                 ZegoMenuBarButtonName.toggleMicrophoneButton,
                 ZegoMenuBarButtonName.showMemberListButton,
                 ZegoMenuBarButtonName.switchCameraButton,

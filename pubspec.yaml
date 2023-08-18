@@ -42,7 +42,7 @@ dependencies:
   go_router: ^9.0.3
   http: ^0.13.4
   email_validator: ^2.1.17
-  zego_uikit_prebuilt_call: ^3.10.5
+  zego_uikit_prebuilt_call: ^3.12.3
   zego_uikit_signaling_plugin: ^2.2.0
   firebase_messaging: ^14.6.5
   firebase_core: ^2.15.0
