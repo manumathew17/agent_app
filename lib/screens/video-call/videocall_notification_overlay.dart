@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lively_studio/provider/websocket_provider.dart';
 import 'package:lively_studio/screens/video-call/videocall_screen.dart';
@@ -7,13 +8,15 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../app_color.dart';
 import '../../model/model_video_call_request.dart';
 
 class VideoCallNotificationPopup extends StatefulWidget {
   final VideoCallRequest videoCallRequest;
   final VoidCallback onJoinCallPressed;
+  final VoidCallback onCallForwardPressed;
 
-  const VideoCallNotificationPopup({super.key, required this.videoCallRequest, required this.onJoinCallPressed});
+  const VideoCallNotificationPopup({super.key, required this.videoCallRequest, required this.onJoinCallPressed, required this.onCallForwardPressed});
 
   @override
   VideoCallNotificationPopupState createState() => VideoCallNotificationPopupState();
@@ -55,24 +58,33 @@ class VideoCallNotificationPopupState extends State<VideoCallNotificationPopup> 
                       initialUrl: widget.videoCallRequest.message.productInfo.productUrl,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Consumer<WebSocketProvider>(
-                          builder: (context, provider, child) {
-                            return FilledButton(
+                  Consumer<WebSocketProvider>(
+                    builder: (context, provider, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (!provider.videoCallRequest.forwarded)
+                            FilledButton(
+                              style: ButtonStyle(
+                                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                backgroundColor: MaterialStateProperty.all<Color>(errorPrimary),
+                              ),
                               onPressed: () {
-                                provider.isButtonDisabled ? null : provider.generateRoomId(widget.onJoinCallPressed);
+                                FlutterRingtonePlayer.stop();
+                                widget.onCallForwardPressed();
                               },
-                              child: const Text('Join call'),
-                            );
-                          },
-                        ),
-                      )
-                    ],
+                              child: const Text('Forward'),
+                            ),
+                          FilledButton(
+                            onPressed: () {
+                              provider.isButtonDisabled ? null : provider.generateRoomId(widget.onJoinCallPressed);
+                            },
+                            child: const Text('Join call'),
+                          ),
+                        ],
+                      );
+                    },
                   )
                 ],
               ),

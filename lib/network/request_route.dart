@@ -79,4 +79,8 @@ class RequestRouter {
   updateScheduledCallStatus(Map<String, dynamic> postBody, RequestCallbacks requestCallbacks) {
     _networkRequest.postCall("schedulecall/update", postBody, requestCallbacks);
   }
+
+  getWareHouses(Map<String, dynamic>? queryParams, RequestCallbacks requestCallbacks) {
+    _networkRequest.getCall("company/warehouses", queryParams, requestCallbacks);
+  }
 }

@@ -6,6 +6,7 @@ import 'package:lively_studio/config/getter.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/network/request_route.dart';
 import 'package:lively_studio/provider/websocket_provider.dart';
+import 'package:lively_studio/screens/video-call/call-forward/warehouse_list_screen.dart';
 import 'package:lively_studio/utils/notification/notification_controller.dart';
 import 'package:lively_studio/widgets/snackbar.dart';
 import 'package:provider/provider.dart';
@@ -89,81 +90,119 @@ class VideoCallScreenState extends State<VideoCallScreen> {
         return false;
       },
       child: SafeArea(
-        child: ZegoUIKitPrebuiltCall(
-            appID: ZEGO_APP_ID,
-            appSign: ZEGO_CLOUD_APP_SIGN,
-            userID: ConfigGetter.USERDETAILS.userId,
-            userName: ConfigGetter.USERDETAILS.user_name,
-            callID: Provider.of<WebSocketProvider>(context).room_id,
-            controller: callController,
-            plugins: [ZegoUIKitSignalingPlugin()],
-            config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
-              ..onOnlySelfInRoom = (context) {
-                if (PrebuiltCallMiniOverlayPageState.idle != ZegoUIKitPrebuiltCallMiniOverlayMachine().state()) {
-                  /// in minimizing
-                  ZegoUIKitPrebuiltCallMiniOverlayMachine().changeState(PrebuiltCallMiniOverlayPageState.idle);
-                } else {
-                  _updateRoomStatus(3, context);
-                  _generalSnackBar.showErrorSnackBar("Customer has ended the call");
+        child: Stack(children: [
+          ZegoUIKitPrebuiltCall(
+              appID: ZEGO_APP_ID,
+              appSign: ZEGO_CLOUD_APP_SIGN,
+              userID: ConfigGetter.USERDETAILS.userId,
+              userName: ConfigGetter.USERDETAILS.user_name,
+              callID: Provider.of<WebSocketProvider>(context).room_id,
+              controller: callController,
+              plugins: [ZegoUIKitSignalingPlugin()],
+              config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+                ..onOnlySelfInRoom = (context) {
+                  if (PrebuiltCallMiniOverlayPageState.idle != ZegoUIKitPrebuiltCallMiniOverlayMachine().state()) {
+                    /// in minimizing
+                    ZegoUIKitPrebuiltCallMiniOverlayMachine().changeState(PrebuiltCallMiniOverlayPageState.idle);
+                  } else {
+                    _updateRoomStatus(3, context);
+                    _generalSnackBar.showErrorSnackBar("Customer has ended the call");
+                  }
                 }
-              }
-              ..durationConfig = ZegoCallDurationConfig(onDurationUpdate: (duration) {
-                if (duration.inMinutes >= MAX_CALL_TIME) {
-                  _updateRoomStatus(3, context);
-                }
-              })
-              ..bottomMenuBarConfig.buttons = [
-                ZegoMenuBarButtonName.hangUpButton,
-                ZegoMenuBarButtonName.minimizingButton,
-                ZegoMenuBarButtonName.toggleCameraButton,
-                ZegoMenuBarButtonName.chatButton,
-                ZegoMenuBarButtonName.toggleMicrophoneButton,
-                ZegoMenuBarButtonName.showMemberListButton,
-                ZegoMenuBarButtonName.switchCameraButton,
-              ]
-              ..onHangUpConfirmation = (BuildContext context) async {
-                return await showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return WillPopScope(
-                      onWillPop: () async {
-                        return false;
-                      },
-                      child: AlertDialog(
-                        title: const Text('Confirmation'),
-                        content: const Text('Are you sure to exit the meeting ?'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('Cancel'),
-                            onPressed: () {
-                              Navigator.of(context).pop(false);
-                            },
-                          ),
-                          TextButton(
-                            child: const Text(
-                              'Exit',
-                              style: TextStyle(color: Colors.red),
+                ..durationConfig = ZegoCallDurationConfig(onDurationUpdate: (duration) {
+                  if (duration.inMinutes >= MAX_CALL_TIME) {
+                    _updateRoomStatus(3, context);
+                  }
+                })
+                ..bottomMenuBarConfig.buttons = [
+                  ZegoMenuBarButtonName.hangUpButton,
+                  ZegoMenuBarButtonName.minimizingButton,
+                  ZegoMenuBarButtonName.toggleCameraButton,
+                  ZegoMenuBarButtonName.chatButton,
+                  ZegoMenuBarButtonName.toggleMicrophoneButton,
+                  ZegoMenuBarButtonName.showMemberListButton,
+                  ZegoMenuBarButtonName.switchCameraButton,
+                ]
+                ..onHangUpConfirmation = (BuildContext context) async {
+                  return await showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return WillPopScope(
+                        onWillPop: () async {
+                          return false;
+                        },
+                        child: AlertDialog(
+                          title: const Text('Confirmation'),
+                          content: const Text('Are you sure to exit the meeting ?'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
                             ),
-                            onPressed: () {
-                              _updateRoomStatus(3, context);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }
+                            TextButton(
+                              child: const Text(
+                                'Exit',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              onPressed: () {
+                                _updateRoomStatus(3, context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
 
-              /// support minimizing
-              ..topMenuBarConfig.isVisible = false
-              ..topMenuBarConfig.buttons = [
-                ZegoMenuBarButtonName.minimizingButton,
-                ZegoMenuBarButtonName.showMemberListButton,
-                ZegoMenuBarButtonName.toggleScreenSharingButton,
-              ]),
+                /// support minimizing
+                ..topMenuBarConfig.isVisible = false
+                ..topMenuBarConfig.buttons = [
+                  ZegoMenuBarButtonName.minimizingButton,
+                  ZegoMenuBarButtonName.showMemberListButton,
+                  ZegoMenuBarButtonName.toggleScreenSharingButton,
+                ]),
+          Positioned(
+            right: 0, // Align to the right side of the screen
+            top: MediaQuery.of(context).size.height / 2 - 25, // Adjust the top position as needed
+            child: ElevatedButton(
+              onPressed: () {
+                _showBottomSheetLocation();
+              },
+              child: const Text('Forward'),
+            ),
+          ),
+        ]),
       ),
     );
   }
+
+  void onCallForwarded() {
+    Navigator.of(context).pop(true);
+  }
+
+
+  void _showBottomSheetLocation() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+          ),
+          child:  WareHouseList(onCallForwarded: onCallForwarded),
+        );
+      },
+    );
+  }
+
 }

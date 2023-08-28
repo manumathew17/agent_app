@@ -170,7 +170,6 @@ class WebSocketProvider extends ChangeNotifier {
   }
 
   sendMessageViaSocket() {
-    initialiseWebSocket();
     final message = {
       "action": "sendMessage",
       "message": {"status": "success", "roomId": videoCallRequest.ROOM_ID},
@@ -178,27 +177,49 @@ class WebSocketProvider extends ChangeNotifier {
       "token": videoCallRequest.token
     };
 
-    webSocketChannel.sink.add(jsonEncode(message).toString());
+    sendWebSocketMessage(message);
+
     hideVideoCallRingDialog();
+  }
+
+  sendMessageForCallForwarding(String warehouse_uuid) {
+    final message = {
+      "action": "sendMessage",
+      "message": {"status": "success", "type": "forwardCall", "warehouse_uuid": warehouse_uuid},
+      "to": videoCallRequest.message.userInfo.userID,
+      "token": videoCallRequest.token
+    };
+
+    sendWebSocketMessage(message);
+    //hideVideoCallRingDialog();
+  }
+
+  sendWebSocketMessage(Map<String, Object> message) {
+    initialiseWebSocket();
+    webSocketChannel.sink.add(jsonEncode(message).toString());
   }
 
   _startTimer() {
     Future.delayed(const Duration(seconds: WAIT_TIME), () {
-      showVideoCallInfo = false;
-      isButtonDisabled = false;
-
-      _timer?.cancel();
-
-      notifyListeners();
+      closeVideoCallOverlay();
     });
   }
+
+  closeVideoCallOverlay(){
+    showVideoCallInfo = false;
+    isButtonDisabled = false;
+
+    _timer?.cancel();
+
+    notifyListeners();
+  }
+
 
   Future<void> checkData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.reload();
     String notificationData = prefs.getString(PREF_NOTIFICATION) ?? "";
     String savedTimeString = prefs.getString(PREF_CALL_TIME) ?? "";
-    print(notificationData);
 
     if (notificationData != "" && savedTimeString != "") {
       DateTime savedTime = DateTime.parse(savedTimeString);

@@ -9,11 +9,13 @@ class VideoCallRequest {
   late Message message;
   late String token;
   late String ROOM_ID;
+  late final bool forwarded;
 
   VideoCallRequest.fromJson(Map<String, dynamic> json) {
     action = json['action'] ?? "NA";
     message = Message.fromJson(json['message']);
     token = json['token'];
+    forwarded = json['forwarded'] ?? false;
   }
 
   Map<String, dynamic> toJson() {

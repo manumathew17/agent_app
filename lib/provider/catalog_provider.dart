@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:lively_studio/model/model_location.dart';
 import 'package:lively_studio/network/callback.dart';
 import 'package:lively_studio/utils/Logger.dart';
 
@@ -14,15 +15,18 @@ class CatalogProvider extends ChangeNotifier {
   List<Product> filteredProductList = [];
   bool isLoading = true;
 
+  List<Location> companyLocation = [];
+  List<Location> filteredLocation = [];
+
+  getCompanyLocation() {
+    requestRouter.getWareHouses(
+        null, RequestCallbacks(onSuccess: (response) => _createWareHouseList(response), onError: (error) => {Logger.log(error)}));
+  }
+
   getProductsList() {
-    final queryParams = {
-      "limit":"100"
-    };
+    final queryParams = {"limit": "100"};
     requestRouter.getProductList(
-        queryParams,
-        RequestCallbacks(
-            onSuccess: (response) => _createList(response),
-            onError: (error) => {Logger.log(error)}));
+        queryParams, RequestCallbacks(onSuccess: (response) => _createList(response), onError: (error) => {Logger.log(error)}));
   }
 
   search(String query) {
@@ -35,6 +39,21 @@ class CatalogProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void filterLocations(String searchString) {
+    filteredLocation = companyLocation.where((location) {
+      Map<String, dynamic> locationJson = location.toJson();
+
+      for (var value in locationJson.values) {
+        if (value.toString().toLowerCase().contains(searchString.toLowerCase())) {
+          return true;
+        }
+      }
+      return false;
+    }).toList();
+
+    notifyListeners();
+  }
+
   _createList(response) {
     Map<String, dynamic> jsonDataMap = jsonDecode(response);
     List<dynamic> data = jsonDataMap['data']['data'];
@@ -42,6 +61,14 @@ class CatalogProvider extends ChangeNotifier {
     print(productList);
     filteredProductList = productList;
     isLoading = false;
+    notifyListeners();
+  }
+
+  _createWareHouseList(response) {
+    Map<String, dynamic> jsonDataMap = jsonDecode(response);
+    List<dynamic> data = jsonDataMap['data'];
+    companyLocation = data.map((item) => Location.fromJson(item)).toList();
+    filteredLocation = companyLocation;
     notifyListeners();
   }
 }

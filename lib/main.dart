@@ -158,6 +158,12 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     GoRouter.of(widget.navigatorKey.currentState!.context).push("/video-call");
   }
 
+  void forwardCall() {
+    SharedPreferenceUtility.setCallAttended(true);
+    Provider.of<WebSocketProvider>(widget.navigatorKey.currentState!.context, listen: false).closeVideoCallOverlay();
+    GoRouter.of(widget.navigatorKey.currentState!.context).push("/locations");
+  }
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addObserver(lifecycleObserver);
@@ -193,7 +199,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
                         }
 
                         if (videoCall.showVideoCallInfo) {
-                          return VideoCallNotificationPopup(videoCallRequest: videoCall.videoCallRequest, onJoinCallPressed: joinCall);
+                          return VideoCallNotificationPopup(videoCallRequest: videoCall.videoCallRequest, onJoinCallPressed: joinCall, onCallForwardPressed: forwardCall);
                         } else {
                           return Container();
                         }
