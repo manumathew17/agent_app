@@ -32,6 +32,10 @@ class VideoCallScreenState extends State<VideoCallScreen> {
     callToken = Provider.of<WebSocketProvider>(ctx, listen: false).call_token;
     if (Provider.of<WebSocketProvider>(ctx, listen: false).isInstantCall) {
       final requestBody = {'token': callToken, 'call_status': status};
+      if (status == 2) {
+        requestBody['room_id'] = Provider.of<WebSocketProvider>(context).room_id;
+      }
+
       requestRouter.updateCallStatus(
           requestBody,
           RequestCallbacks(onSuccess: (response) {
@@ -184,7 +188,6 @@ class VideoCallScreenState extends State<VideoCallScreen> {
     Navigator.of(context).pop(true);
   }
 
-
   void _showBottomSheetLocation() {
     showModalBottomSheet(
       context: context,
@@ -199,10 +202,9 @@ class VideoCallScreenState extends State<VideoCallScreen> {
               topRight: Radius.circular(16.0),
             ),
           ),
-          child:  WareHouseList(onCallForwarded: onCallForwarded),
+          child: WareHouseList(onCallForwarded: onCallForwarded),
         );
       },
     );
   }
-
 }
